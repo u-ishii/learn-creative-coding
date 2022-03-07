@@ -10,7 +10,15 @@ const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
-    p.circle(p.width / 2, p.height / 2, 50);
+  };
+  let d = 0;
+  p.draw = () => {
+    d += 2;
+    if (d / 2 > p.dist(0, 0, p.width / 2, p.height / 2)) {
+      d = 0;
+    }
+    p.clear(0, 0, 0, 0);
+    p.circle(p.width / 2, p.height / 2, d);
   };
   /* eslint-enable no-param-reassign */
 };
