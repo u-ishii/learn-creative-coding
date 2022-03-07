@@ -11,14 +11,17 @@ const initializeP5 = (p: P5) => {
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
   };
-  let d = 0;
+  let t = 0;
   p.draw = () => {
-    d += 2;
-    if (d / 2 > p.dist(0, 0, p.width / 2, p.height / 2)) {
-      d = 0;
+    const x = p.lerp(0, p.width, t);
+    const y = p.lerp(0, p.height, t);
+    t += 0.005;
+    if (t > 1) {
+      t = 0;
     }
+
     p.clear(0, 0, 0, 0);
-    p.circle(p.width / 2, p.height / 2, d);
+    p.circle(x, y, 20);
   };
   /* eslint-enable no-param-reassign */
 };
