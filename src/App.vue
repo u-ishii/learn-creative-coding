@@ -13,15 +13,24 @@ const initializeP5 = (p: P5) => {
   };
   let t = 0;
   p.draw = () => {
-    const x = p.lerp(0, p.width, t);
-    const y = p.lerp(0, p.height, t);
     t += 0.005;
     if (t > 1) {
       t = 0;
     }
 
     p.clear(0, 0, 0, 0);
-    p.circle(x, y, 20);
+    p.fill('blue');
+    p.circle(
+      p.lerp(0, p.width, t),
+      p.lerp(0, p.height, t),
+      20,
+    );
+    p.fill('red');
+    p.circle(
+      p.lerp(0, p.width, t * t),
+      p.lerp(0, p.height, t * t),
+      20,
+    );
   };
   /* eslint-enable no-param-reassign */
 };
