@@ -10,15 +10,20 @@ const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
-    p.translate(p.width / 2, p.height / 2);
     p.angleMode(p.DEGREES);
-    p.noStroke();
-    for (let angle = 0; angle < 360; angle += 1) {
-      p.circle(p.cos(angle) * 100, p.sin(angle) * 100, 10);
-    }
   };
-  // p.draw = () => {
-  // };
+  let angle = 0;
+  p.draw = () => {
+    p.translate(p.width / 2, p.height / 2);
+    p.clear(0, 0, 0, 0);
+    p.stroke(240);
+    p.noFill();
+    p.circle(0, 0, 100 * 2);
+    p.noStroke();
+    p.fill(240);
+    p.circle(p.cos(angle) * 100, p.sin(angle) * 100, 10);
+    angle += 1;
+  };
   /* eslint-enable no-param-reassign */
 };
 
