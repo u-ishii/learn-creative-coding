@@ -10,28 +10,15 @@ const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
-  };
-  let t = 0;
-  p.draw = () => {
-    t += 0.005;
-    if (t > 1) {
-      t = 0;
+    p.translate(p.width / 2, p.height / 2);
+    p.angleMode(p.DEGREES);
+    p.noStroke();
+    for (let angle = 0; angle < 360; angle += 1) {
+      p.circle(p.cos(angle) * 100, p.sin(angle) * 100, 10);
     }
-
-    p.clear(0, 0, 0, 0);
-    p.fill('blue');
-    p.circle(
-      p.lerp(0, p.width, t),
-      p.lerp(0, p.height, t),
-      20,
-    );
-    p.fill('red');
-    p.circle(
-      p.lerp(0, p.width, t * t),
-      p.lerp(0, p.height, t * t),
-      20,
-    );
   };
+  // p.draw = () => {
+  // };
   /* eslint-enable no-param-reassign */
 };
 
