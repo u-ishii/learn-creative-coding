@@ -22,7 +22,7 @@ const initializeP5 = (p: P5) => {
     p.noStroke();
     p.fill(240);
     p.circle(p.cos(angle) * 100, p.sin(angle) * 100, 10);
-    angle += 1;
+    angle = (angle + 5) % 360;
   };
   /* eslint-enable no-param-reassign */
 };
