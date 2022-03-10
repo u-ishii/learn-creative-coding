@@ -12,17 +12,13 @@ const initializeP5 = (p: P5) => {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.angleMode(p.DEGREES);
   };
-  let angle = 0;
   p.draw = () => {
-    p.translate(p.width / 2, p.height / 2);
-    p.clear(0, 0, 0, 0);
-    p.stroke(240);
-    p.noFill();
-    p.circle(0, 0, 100 * 2);
-    p.noStroke();
-    p.fill(240);
-    p.circle(p.cos(angle) * 100, p.sin(angle) * 100, 10);
-    angle = (angle + 5) % 360;
+    p.stroke(p.random(256), p.random(256), p.random(256));
+    for (let i = 0; i < 100; i += 1) {
+      const x = p.random(p.width);
+      const y = p.random(p.height);
+      p.point(x, y);
+    }
   };
   /* eslint-enable no-param-reassign */
 };
