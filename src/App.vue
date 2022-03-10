@@ -11,14 +11,17 @@ const initializeP5 = (p: P5) => {
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.angleMode(p.DEGREES);
+    p.pixelDensity(1);
   };
   p.draw = () => {
-    p.stroke(p.random(256), p.random(256), p.random(256));
-    for (let i = 0; i < 100; i += 1) {
-      const x = p.random(p.width);
-      const y = p.random(p.height);
-      p.point(x, y);
+    p.loadPixels();
+    for (let i = 0; i < p.pixels.length; i += 1) {
+      p.pixels[i + 0] = p.random(256);
+      p.pixels[i + 1] = p.random(256);
+      p.pixels[i + 2] = p.random(256);
+      p.pixels[i + 3] = p.random(256);
     }
+    p.updatePixels();
   };
   /* eslint-enable no-param-reassign */
 };
