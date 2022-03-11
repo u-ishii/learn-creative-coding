@@ -6,23 +6,43 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
+  const lerp2d = (a: Point, b: Point, t: number) => (
+    {
+      x: p.lerp(a.x, b.x, t),
+      y: p.lerp(a.y, b.y, t),
+    }
+  );
+  const drawBezier = (a: Point, b: Point, c: Point) => {
+    let prev = a;
+    const n = 100;
+    for (let i = 0; i <= n; i += 1) {
+      const t = i / n;
+      const d = lerp2d(a, b, t);
+      const e = lerp2d(b, c, t);
+      const f = lerp2d(d, e, t);
+      p.line(prev.x, prev.y, f.x, f.y);
+      prev = f;
+    }
+  };
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.angleMode(p.DEGREES);
-    p.pixelDensity(1);
+    p.stroke(240);
+    drawBezier(
+      { x: 0, y: p.height },
+      { x: p.width / 2, y: 0 },
+      { x: p.width, y: p.height },
+    );
   };
-  p.draw = () => {
-    p.loadPixels();
-    for (let i = 0; i < p.pixels.length; i += 1) {
-      p.pixels[i + 0] = p.random(256);
-      p.pixels[i + 1] = p.random(256);
-      p.pixels[i + 2] = p.random(256);
-      p.pixels[i + 3] = p.random(256);
-    }
-    p.updatePixels();
-  };
+  // p.draw = () => {
+  // };
   /* eslint-enable no-param-reassign */
 };
 
