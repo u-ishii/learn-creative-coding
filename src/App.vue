@@ -26,7 +26,7 @@ const initializeP5 = (p: P5) => {
       {
         x: 0,
         y: 0,
-        vx: p.floor(p.random(1, 10)),
+        vx: p.random(1, 10),
         vy: 0,
       },
     ]
