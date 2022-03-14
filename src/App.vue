@@ -11,6 +11,7 @@ interface Ball {
   readonly y: number;
   readonly vx: number;
   readonly vy: number;
+  readonly bounded: number;
 }
 
 const initializeP5 = (p: P5) => {
@@ -27,9 +28,10 @@ const initializeP5 = (p: P5) => {
       ...balls,
       {
         x: p.width / 2,
-        y: p.height,
+        y: p.height * 0.9,
         vx: p.noise(noiseX) * 10 - 5,
-        vy: -10,
+        vy: -7,
+        bounded: 0,
       },
     ]
       .map((ball): Ball => ({
@@ -41,7 +43,16 @@ const initializeP5 = (p: P5) => {
         x: ball.x + ball.vx,
         y: ball.y + ball.vy,
       }))
-      .filter((ball) => ball.y <= p.height);
+      .map((ball): Ball => (
+        ball.y > p.height
+          ? {
+            ...ball,
+            vy: ball.vy * -1,
+            bounded: ball.bounded + 1,
+          }
+          : ball
+      ))
+      .filter((ball) => ball.bounded < 2);
     p.clear(0, 0, 0, 0);
     p.noStroke();
     p.fill(240);
