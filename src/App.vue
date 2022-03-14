@@ -6,33 +6,25 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 
-interface Point {
-  x: number;
-  y: number;
-}
-
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
+  let x = 0;
+  let y = 0;
+  let vx: number;
+  let vy = 0;
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.stroke(240);
+    vx = p.floor(p.random(1, 5));
   };
-  let angle = 0;
   p.draw = () => {
+    vy += 0.1;
+    x += vx;
+    y += vy;
     p.clear(0, 0, 0, 0);
-    p.applyMatrix(1, 0, 0, 1, p.width / 2, p.height / 2);
-    p.applyMatrix(2, 0, 0, 2, 0, 0);
-    p.applyMatrix(
-      // p.cos(angle),
-      0,
-      p.sin(angle),
-      -p.sin(angle),
-      // p.cos(angle),
-      0,
-      0, 0,
-    );
-    p.circle(100, 0, 20);
-    angle += 0.02;
+    p.noStroke();
+    p.fill(240);
+    p.circle(x, y, 10);
   };
   /* eslint-enable no-param-reassign */
 };
