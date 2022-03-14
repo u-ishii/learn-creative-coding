@@ -16,17 +16,19 @@ interface Ball {
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
   let balls: ReadonlyArray<Ball> = [];
+  let noiseX = 0;
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.stroke(240);
   };
   p.draw = () => {
+    noiseX += 0.05;
     balls = [
       ...balls,
       {
         x: 0,
         y: 0,
-        vx: p.random(1, 10),
+        vx: p.noise(noiseX) * 10,
         vy: 0,
       },
     ]
