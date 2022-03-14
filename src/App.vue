@@ -26,10 +26,10 @@ const initializeP5 = (p: P5) => {
     balls = [
       ...balls,
       {
-        x: 0,
-        y: 0,
-        vx: p.noise(noiseX) * 10,
-        vy: 0,
+        x: p.width / 2,
+        y: p.height,
+        vx: p.noise(noiseX) * 10 - 5,
+        vy: -10,
       },
     ]
       .map((ball): Ball => ({
