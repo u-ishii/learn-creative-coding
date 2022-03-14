@@ -6,25 +6,46 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 
+interface Ball {
+  readonly x: number;
+  readonly y: number;
+  readonly vx: number;
+  readonly vy: number;
+}
+
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
-  let x = 0;
-  let y = 0;
-  let vx: number;
-  let vy = 0;
+  let balls: ReadonlyArray<Ball> = [];
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.stroke(240);
-    vx = p.floor(p.random(1, 5));
   };
   p.draw = () => {
-    vy += 0.1;
-    x += vx;
-    y += vy;
+    balls = [
+      ...balls,
+      {
+        x: 0,
+        y: 0,
+        vx: p.floor(p.random(1, 10)),
+        vy: 0,
+      },
+    ]
+      .map((ball): Ball => ({
+        ...ball,
+        vy: ball.vy + 0.1,
+      }))
+      .map((ball): Ball => ({
+        ...ball,
+        x: ball.x + ball.vx,
+        y: ball.y + ball.vy,
+      }))
+      .filter((ball) => ball.y <= p.height);
     p.clear(0, 0, 0, 0);
     p.noStroke();
     p.fill(240);
-    p.circle(x, y, 10);
+    balls.forEach((ball) => {
+      p.circle(ball.x, ball.y, 10);
+    });
   };
   /* eslint-enable no-param-reassign */
 };
