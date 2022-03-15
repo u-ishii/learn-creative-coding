@@ -6,32 +6,91 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 
-interface Position {
+type OriginalOperator = 'F' | 'X' | 'Y';
+type GeneralOperator = '+' | '-' | '[' | ']';
+type Operator = OriginalOperator | GeneralOperator;
+type Command = ReadonlyArray<Operator>;
+type Rules = Partial<Record<Operator, Command>>;
+
+interface StackElement {
   readonly x: number;
   readonly y: number;
+  readonly angle: number;
+}
+
+interface Data {
+  readonly start: Command;
+  readonly rules: Rules;
+  readonly length: number;
+  readonly depth: number;
+  readonly x: number;
+  readonly y: number;
+  readonly startAngle: number;
+  readonly angle: number;
+  readonly none: Command;
 }
 
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
-  const dragon = (n: number, a: Position, b: Position, sign: 1 | -1) => {
-    if (n === 0) {
-      p.line(a.x, a.y, b.x, b.y);
-      return;
+  const addCommand = (command: Command, rules: Rules): Command => (
+    command
+      .flatMap((operator: Operator) => rules?.[operator] || [operator])
+  );
+  const drawLSystem = (data: Data) => {
+    let command = data.start;
+    for (let i = 0; i < data.depth; i += 1) {
+      command = addCommand(command, data.rules);
     }
-    const deg = p.atan2(b.y - a.y, b.x - a.x) - 45 * sign;
-    const d = p.dist(a.x, a.y, b.x, b.y) * (p.sqrt(2) / 2);
-    const c = { x: a.x + p.cos(deg) * d, y: a.y + p.sin(deg) * d };
-    dragon(n - 1, a, c, 1);
-    dragon(n - 1, c, b, -1);
+    const stack: StackElement[] = [];
+    let angle = data.startAngle;
+    let { x } = data;
+    let { y } = data;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const c of command) {
+      switch (c) {
+        case '+':
+          angle -= data.angle;
+          break;
+        case '-':
+          angle += data.angle;
+          break;
+        case '[':
+          stack.push({ angle, x, y });
+          break;
+        case ']':
+          // eslint-disable-next-line no-case-declarations
+          const d = stack.pop();
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          [angle, x, y] = [d!.angle, d!.x, d!.y];
+          break;
+        default:
+          if (data.none.indexOf(c) === -1) {
+            const tx = x + p.cos(angle) * data.length;
+            const ty = y + p.sin(angle) * data.length;
+            p.line(x, y, tx, ty);
+            x = tx;
+            y = ty;
+          }
+          break;
+      }
+    }
   };
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.angleMode(p.DEGREES);
     p.stroke(240);
     p.noFill();
-    const a = { x: p.width * 0.25, y: p.height / 2 };
-    const b = { x: p.width * 0.75, y: p.height / 2 };
-    dragon(20, a, b, 1);
+    drawLSystem({
+      start: ['F'],
+      rules: { F: ['F', '+', 'F', '-', '-', 'F', '+', 'F'] },
+      length: 5,
+      depth: 5,
+      x: 0,
+      y: p.height / 2,
+      startAngle: 0,
+      angle: 60,
+      none: [],
+    });
   };
   // p.draw = () => {
   // };
