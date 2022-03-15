@@ -6,60 +6,35 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 
-interface Ball {
+interface Position {
   readonly x: number;
   readonly y: number;
-  readonly vx: number;
-  readonly vy: number;
-  readonly bounded: number;
 }
 
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
-  let balls: ReadonlyArray<Ball> = [];
-  let noiseX = 0;
+  const dragon = (n: number, a: Position, b: Position, sign: 1 | -1) => {
+    if (n === 0) {
+      p.line(a.x, a.y, b.x, b.y);
+      return;
+    }
+    const deg = p.atan2(b.y - a.y, b.x - a.x) - 45 * sign;
+    const d = p.dist(a.x, a.y, b.x, b.y) * (p.sqrt(2) / 2);
+    const c = { x: a.x + p.cos(deg) * d, y: a.y + p.sin(deg) * d };
+    dragon(n - 1, a, c, 1);
+    dragon(n - 1, c, b, -1);
+  };
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
+    p.angleMode(p.DEGREES);
     p.stroke(240);
+    p.noFill();
+    const a = { x: p.width * 0.25, y: p.height / 2 };
+    const b = { x: p.width * 0.75, y: p.height / 2 };
+    dragon(20, a, b, 1);
   };
-  p.draw = () => {
-    noiseX += 0.05;
-    balls = [
-      ...balls,
-      {
-        x: p.width / 2,
-        y: p.height * 0.9,
-        vx: p.noise(noiseX) * 10 - 5,
-        vy: -7,
-        bounded: 0,
-      },
-    ]
-      .map((ball): Ball => ({
-        ...ball,
-        vy: ball.vy + 0.1,
-      }))
-      .map((ball): Ball => ({
-        ...ball,
-        x: ball.x + ball.vx,
-        y: ball.y + ball.vy,
-      }))
-      .map((ball): Ball => (
-        ball.y > p.height
-          ? {
-            ...ball,
-            vy: ball.vy * -1,
-            bounded: ball.bounded + 1,
-          }
-          : ball
-      ))
-      .filter((ball) => ball.bounded < 2);
-    p.clear(0, 0, 0, 0);
-    p.noStroke();
-    p.fill(240);
-    balls.forEach((ball) => {
-      p.circle(ball.x, ball.y, 10);
-    });
-  };
+  // p.draw = () => {
+  // };
   /* eslint-enable no-param-reassign */
 };
 
