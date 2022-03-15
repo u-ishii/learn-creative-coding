@@ -42,9 +42,8 @@ const initializeP5 = (p: P5) => {
       command = addCommand(command, data.rules);
     }
     const stack: StackElement[] = [];
-    let angle = data.startAngle;
-    let { x } = data;
-    let { y } = data;
+    // let angle = data.startAngle;
+    let { x, y, startAngle: angle } = data;
     // eslint-disable-next-line no-restricted-syntax
     for (const c of command) {
       switch (c) {
