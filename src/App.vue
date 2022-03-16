@@ -37,25 +37,22 @@ const getDirections = (): ReadonlyArray<Position> => (
   ])
 );
 
-const dig = (x: number, y: number, maze: Maze, routes: Position[]) => {
-  // eslint-disable-next-line no-restricted-syntax, guard-for-in
-  for (const dir of getDirections()) {
-    const tx = x + dir.x;
-    const ty = y + dir.y;
-    const tx2 = x + dir.x * 2;
-    const ty2 = y + dir.y * 2;
-    if (tx2 >= 0 && tx2 < MAZE_WIDTH && ty2 >= 0 && ty2 < MAZE_HEIGHT && maze[ty2][tx2] === 'wall') {
-      // eslint-disable-next-line no-param-reassign
-      maze[ty][tx] = 'floor';
-      // eslint-disable-next-line no-param-reassign
-      maze[ty2][tx2] = 'floor';
-      routes.push({ x, y });
-      routes.push({ x: tx2, y: ty2 });
-      return { x: tx2, y: ty2 };
-    }
-  }
-  return null;
-};
+const dig = (x: number, y: number, maze: Maze): [Position, Position] | [] => (
+  getDirections()
+    .map<[Position, Position]>((direction) => ([
+      {
+        x: x + direction.x,
+        y: y + direction.y,
+      },
+      {
+        x: x + direction.x * 2,
+        y: y + direction.y * 2,
+      },
+    ]))
+    .find(([, next]) => (
+      next.x >= 0 && next.x < MAZE_WIDTH && next.y >= 0 && next.y < MAZE_HEIGHT && maze[next.y][next.x] === 'wall'
+    )) || []
+);
 
 const generateWallMaze = (): Maze => (
   Array.from(
@@ -69,14 +66,20 @@ const generateWallMaze = (): Maze => (
 
 const generateMaze = (): Maze => {
   const maze = generateWallMaze();
-  const routes = [];
+  const routes: Position[] = [];
   const sx = Math.floor(Math.random() * (MAZE_WIDTH / 2)) * 2 + 1;
   const sy = Math.floor(Math.random() * (MAZE_HEIGHT / 2)) * 2 + 1;
   maze[sy][sx] = 'floor';
   routes.push({ x: sx, y: sy });
   while (routes.length > 0) {
     const next = routes.pop() as Position;
-    dig(next.x, next.y, maze, routes);
+    const [d1, d2] = dig(next.x, next.y, maze);
+    if (d1 && d2) {
+      maze[d1.y][d1.x] = 'floor';
+      maze[d2.y][d2.x] = 'floor';
+      routes.push(next);
+      routes.push(d2);
+    }
   }
   return maze;
 };
