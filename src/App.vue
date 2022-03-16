@@ -71,9 +71,9 @@ const generateMaze = (): Maze => {
   const maze = generateWallMaze();
   const routes = [];
   // eslint-disable-next-line no-mixed-operators
-  const sx = Math.floor(Math.random() * (MAZE_WIDTH - 1) / 2 - 1) * 2 + 1;
+  const sx = Math.floor(Math.random() * MAZE_WIDTH / 2) * 2 + 1;
   // eslint-disable-next-line no-mixed-operators
-  const sy = Math.floor(Math.random() * (MAZE_HEIGHT - 1) / 2 - 1) * 2 + 1;
+  const sy = Math.floor(Math.random() * MAZE_HEIGHT / 2) * 2 + 1;
   maze[sy][sx] = 'floor';
   routes.push({ x: sx, y: sy });
   while (routes.length > 0) {
