@@ -12,84 +12,100 @@ type Operator = OriginalOperator | GeneralOperator;
 type Command = ReadonlyArray<Operator>;
 type Rules = Partial<Record<Operator, Command>>;
 
-interface StackElement {
+type Cell = 'floor' | 'wall';
+
+interface Position {
   readonly x: number;
   readonly y: number;
-  readonly angle: number;
 }
 
-interface Data {
-  readonly start: Command;
-  readonly rules: Rules;
-  readonly length: number;
-  readonly depth: number;
-  readonly x: number;
-  readonly y: number;
-  readonly startAngle: number;
-  readonly angle: number;
-  readonly none: Command;
-}
+const tileWidth = 59;
+const tileHeight = 41;
+const tileSize = 10;
+const directions: ReadonlyArray<Position> = [
+  { x: 0, y: -1 },
+  { x: 1, y: 0 },
+  { x: 0, y: 1 },
+  { x: -1, y: 0 },
+];
+let map: Cell[][];
+let positions;
+
+const shuffle = <T, > ([...array]: T[]): T[] => {
+  for (let i = array.length - 1; i >= 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    // eslint-disable-next-line no-param-reassign
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
+const getDirections = (): ReadonlyArray<Position> => (
+  shuffle([
+    { x: 0, y: -1 },
+    { x: 1, y: 0 },
+    { x: 0, y: 1 },
+    { x: -1, y: 0 },
+  ])
+);
 
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
-  const addCommand = (command: Command, rules: Rules): Command => (
-    command
-      .flatMap((operator: Operator) => rules?.[operator] || [operator])
-  );
-  const drawLSystem = (data: Data) => {
-    let command = data.start;
-    for (let i = 0; i < data.depth; i += 1) {
-      command = addCommand(command, data.rules);
-    }
-    const stack: StackElement[] = [];
-    // let angle = data.startAngle;
-    let { x, y, startAngle: angle } = data;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const c of command) {
-      switch (c) {
-        case '+':
-          angle -= data.angle;
-          break;
-        case '-':
-          angle += data.angle;
-          break;
-        case '[':
-          stack.push({ angle, x, y });
-          break;
-        case ']':
-          // eslint-disable-next-line no-case-declarations
-          const d = stack.pop();
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          [angle, x, y] = [d!.angle, d!.x, d!.y];
-          break;
-        default:
-          if (data.none.indexOf(c) === -1) {
-            const tx = x + p.cos(angle) * data.length;
-            const ty = y + p.sin(angle) * data.length;
-            p.line(x, y, tx, ty);
-            x = tx;
-            y = ty;
-          }
-          break;
+  const dig = (x: number, y: number) => {
+    // eslint-disable-next-line no-restricted-syntax, guard-for-in
+    for (const dir of getDirections()) {
+      const tx = x + dir.x;
+      const ty = y + dir.y;
+      const tx2 = x + dir.x * 2;
+      const ty2 = y + dir.y * 2;
+
+      if (tx2 >= 0 && tx2 < tileWidth && ty2 >= 0 && ty2 < tileHeight && map[ty2][tx2] === 'wall') {
+        map[ty][tx] = 'floor';
+        map[ty2][tx2] = 'floor';
+        positions.push({ x, y });
+        positions.push({ x: tx2, y: ty2 });
+        return { x: tx2, y: ty2 };
       }
     }
+    return null;
   };
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
-    p.angleMode(p.DEGREES);
-    p.stroke(240);
-    p.noFill();
-    drawLSystem({
-      start: ['F'],
-      rules: { F: ['F', '+', 'F', '-', '-', 'F', '+', 'F'] },
-      length: 5,
-      depth: 5,
-      x: 0,
-      y: p.height / 2,
-      startAngle: 0,
-      angle: 60,
-      none: [],
-    });
+
+    map = [];
+    for (let y = 0; y < tileHeight; y += 1) {
+      map[y] = [];
+      for (let x = 0; x < tileWidth; x += 1) {
+        map[y][x] = 'wall';
+      }
+    }
+
+    positions = [];
+
+    const sx = p.floor(p.random((tileWidth - 1) / 2 - 1)) * 2 + 1;
+    const sy = p.floor(p.random((tileHeight - 1) / 2 - 1)) * 2 + 1;
+    map[sy][sx] = 'floor';
+    positions.push({ x: sx, y: sy });
+
+    while (positions.length > 0) {
+      const next = positions.pop();
+      dig(next!.x, next!.y);
+    }
+
+    p.clear(0, 0, 0, 0);
+    p.fill('#666');
+    p.strokeWeight(1);
+
+    for (let y = 0; y < tileHeight; y += 1) {
+      for (let x = 0; x < tileWidth; x += 1) {
+        const tile = map[y][x];
+        if (tile === 'wall') {
+          const tx = x * tileSize;
+          const ty = y * tileSize;
+          p.rect(tx, ty, tileSize, tileSize);
+        }
+      }
+    }
   };
   // p.draw = () => {
   // };
