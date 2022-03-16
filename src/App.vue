@@ -93,11 +93,8 @@ const initializeP5 = (p: P5) => {
     p.strokeWeight(1);
     for (let y = 0; y < MAZE_HEIGHT; y += 1) {
       for (let x = 0; x < MAZE_WIDTH; x += 1) {
-        const tile = maze[y][x];
-        if (tile === 'wall') {
-          const tx = x * TILE_SIZE;
-          const ty = y * TILE_SIZE;
-          p.rect(tx, ty, TILE_SIZE, TILE_SIZE);
+        if (maze[y][x] === 'wall') {
+          p.rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
       }
     }
