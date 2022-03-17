@@ -41,7 +41,9 @@
     "parserOptions": {
       "ecmaVersion": 2020
     },
-    "rules": {}
+    "rules": {
+      "import/prefer-default-export": "off"
+    }
   },
   "browserslist": [
     "> 1%",
