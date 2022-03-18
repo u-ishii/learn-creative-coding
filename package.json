@@ -42,7 +42,8 @@
       "ecmaVersion": 2020
     },
     "rules": {
-      "import/prefer-default-export": "off"
+      "import/prefer-default-export": "off",
+      "no-use-before-define": "off"
     }
   },
   "browserslist": [

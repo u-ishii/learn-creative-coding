@@ -5,26 +5,35 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import P5 from 'p5';
+import { Maze, Position } from '@/types/maze';
 import { generateMaze } from '@/utils/maze-generator';
-import { drawMaze } from '@/utils/maze-drawer';
+import { drawMaze, drawTile } from '@/utils/maze-drawer';
 
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
 const TILE_SIZE = 10;
+const START_POSITION: Position = { x: 1, y: 1 };
+const GOAL_POSITION: Position = { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 };
 
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
+  let maze: Maze;
+  let cursors: Position[];
   p.setup = () => {
-    const maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
+    maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
     p.createCanvas(p.windowWidth, p.windowHeight);
     p.clear(0, 0, 0, 0);
-    p.fill('#666');
-    p.strokeWeight(1);
+    p.fill('gray');
     drawMaze(p, maze, TILE_SIZE);
-    p.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
-    drawMaze(p, maze, TILE_SIZE);
+    p.fill('blue');
+    drawTile(p, START_POSITION, TILE_SIZE);
+    p.fill('red');
+    drawTile(p, GOAL_POSITION, TILE_SIZE);
+    // p.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
+    // drawMaze(p, maze, TILE_SIZE);
   };
   // p.draw = () => {
+  //   if (!maze) return;
   // };
   /* eslint-enable no-param-reassign */
 };
