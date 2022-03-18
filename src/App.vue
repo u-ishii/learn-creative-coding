@@ -6,6 +6,7 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 import { Maze, Position } from '@/types/maze';
+import { addPositions, DIRECTIONS } from '@/utils/position-calculator';
 import { generateMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
 
@@ -18,7 +19,8 @@ const GOAL_POSITION: Position = { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 };
 const initializeP5 = (p: P5) => {
   /* eslint-disable no-param-reassign */
   let maze: Maze;
-  let cursors: Position[];
+  let histories: Position[][];
+  const visited = new Set<Position>();
   p.setup = () => {
     maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
     p.createCanvas(p.windowWidth, p.windowHeight);
@@ -31,10 +33,21 @@ const initializeP5 = (p: P5) => {
     drawTile(p, GOAL_POSITION, TILE_SIZE);
     // p.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
     // drawMaze(p, maze, TILE_SIZE);
+    histories = [[START_POSITION]];
   };
-  // p.draw = () => {
-  //   if (!maze) return;
-  // };
+  p.draw = () => {
+    if (!histories) return;
+    const aroundPositions = new Set(
+      histories.flatMap(
+        (cursors) => cursors.flatMap(
+          (cursor) => DIRECTIONS.map(
+            (d) => addPositions(cursor, d),
+          ),
+        ),
+      ),
+    );
+    aroundPositions.forEach((position) => drawTile(p, position, TILE_SIZE));
+  };
   /* eslint-enable no-param-reassign */
 };
 
