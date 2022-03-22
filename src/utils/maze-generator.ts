@@ -1,5 +1,6 @@
-import { Position, Maze } from '@/types/maze';
+import { Position, Maze, Cell } from '@/types/maze';
 import { addPositions, getShuffledDirections } from '@/utils/position-calculator';
+import { generate2dArray } from './array-generator';
 
 const dig = (cursor: Position, maze: Maze, width: number, height: number)
     : [Position, Position] | undefined => (
@@ -13,18 +14,8 @@ const dig = (cursor: Position, maze: Maze, width: number, height: number)
     ))
 );
 
-const generateWallMaze = (width: number, height: number): Maze => (
-  Array.from(
-    { length: height },
-    () => Array.from(
-      { length: width },
-      () => 'wall',
-    ),
-  )
-);
-
 export const generateMaze = (width: number, height: number): Maze => {
-  const maze = generateWallMaze(width, height);
+  const maze = generate2dArray<Cell>(height, width, 'wall');
   const routes: Position[] = [];
   const start: Position = {
     x: Math.floor(Math.random() * (width / 2)) * 2 + 1,

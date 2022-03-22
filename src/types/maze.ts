@@ -1,4 +1,4 @@
-type Cell = 'floor' | 'wall';
+export type Cell = 'floor' | 'wall';
 export type Maze = Cell[][];
 
 export interface Position {

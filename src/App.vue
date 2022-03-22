@@ -9,6 +9,7 @@ import { Maze, Position } from '@/types/maze';
 import { addPositions, DIRECTIONS } from '@/utils/position-calculator';
 import { generateMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
+import { generate2dArray } from '@/utils/array-generator';
 
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
@@ -16,37 +17,40 @@ const TILE_SIZE = 10;
 const START_POSITION: Position = { x: 1, y: 1 };
 const GOAL_POSITION: Position = { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 };
 
-const initializeP5 = (p: P5) => {
+const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   let maze: Maze;
-  let histories: Position[][];
-  const visited = new Set<Position>();
-  p.setup = () => {
+  let pastPositions: Position[][];
+  const visitedMaze: boolean[][] = generate2dArray(MAZE_HEIGHT, MAZE_WIDTH, false);
+  p5.setup = () => {
     maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
-    p.createCanvas(p.windowWidth, p.windowHeight);
-    p.clear(0, 0, 0, 0);
-    p.fill('gray');
-    drawMaze(p, maze, TILE_SIZE);
-    p.fill('blue');
-    drawTile(p, START_POSITION, TILE_SIZE);
-    p.fill('red');
-    drawTile(p, GOAL_POSITION, TILE_SIZE);
+    p5.createCanvas(p5.windowWidth, p5.windowHeight);
+    p5.clear(0, 0, 0, 0);
+    p5.fill('gray');
+    drawMaze(p5, maze, TILE_SIZE);
+    p5.fill('blue');
+    drawTile(p5, START_POSITION, TILE_SIZE);
+    p5.fill('red');
+    drawTile(p5, GOAL_POSITION, TILE_SIZE);
     // p.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
     // drawMaze(p, maze, TILE_SIZE);
-    histories = [[START_POSITION]];
+    pastPositions = [[START_POSITION]];
   };
-  p.draw = () => {
-    if (!histories) return;
-    const aroundPositions = new Set(
-      histories.flatMap(
-        (cursors) => cursors.flatMap(
-          (cursor) => DIRECTIONS.map(
-            (d) => addPositions(cursor, d),
-          ),
+  p5.draw = () => {
+    if (!pastPositions) return;
+    const aroundPositions = Array.from(new Set(
+      pastPositions[pastPositions.length - 1].flatMap(
+        (cursor) => DIRECTIONS.map(
+          (direction) => addPositions(cursor, direction),
         ),
       ),
-    );
-    aroundPositions.forEach((position) => drawTile(p, position, TILE_SIZE));
+    ))
+      .filter((position) => maze[position.y][position.x] === 'floor')
+      .filter((position) => !visitedMaze[position.y][position.x]);
+    console.log(aroundPositions);
+    aroundPositions.forEach((position) => drawTile(p5, position, TILE_SIZE));
+    aroundPositions.forEach((position) => { visitedMaze[position.y][position.x] = true; });
+    pastPositions.push(aroundPositions);
   };
   /* eslint-enable no-param-reassign */
 };
