@@ -14,8 +14,14 @@ import { solveDfs } from '@/utils/dfs-solver';
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
 const TILE_SIZE = 10;
-const START_POSITION: Position = { x: 1, y: 1 };
-const GOAL_POSITION: Position = { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 };
+const START_POSITION: Position = {
+  x: Math.floor(MAZE_WIDTH / 3),
+  y: Math.floor(MAZE_HEIGHT / 3),
+};
+const GOAL_POSITION: Position = {
+  x: MAZE_WIDTH - Math.floor(MAZE_WIDTH / 3) - 1,
+  y: MAZE_HEIGHT - Math.floor(MAZE_HEIGHT / 3) - 1,
+};
 
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
