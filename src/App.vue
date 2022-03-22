@@ -5,10 +5,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import P5 from 'p5';
-import { Maze, Position } from '@/types/maze';
+import { Position } from '@/types/maze';
 import { generateMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
 import { solveBfs } from '@/utils/bfs-solver';
+import { solveDfs } from '@/utils/dfs-solver';
 
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
@@ -18,35 +19,42 @@ const GOAL_POSITION: Position = { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 };
 
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
-  let maze: Maze;
+  const maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
+  const bfsHistory = solveBfs(maze, START_POSITION, GOAL_POSITION).flat();
+  const dfsHistory = solveDfs(maze, START_POSITION, GOAL_POSITION).flat();
   let drawingIndex = 0;
-  let bfsHistory: Position[];
   const drawWalls = (): void => {
     p5.fill('gray');
     drawMaze(p5, maze, TILE_SIZE);
   };
-  const drawFixedPositions = (): void => {
+  const drawFixedTiles = (): void => {
     p5.fill('blue');
     drawTile(p5, START_POSITION, TILE_SIZE);
     p5.fill('red');
     drawTile(p5, GOAL_POSITION, TILE_SIZE);
   };
   p5.setup = () => {
-    maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
-    bfsHistory = solveBfs(maze, START_POSITION, GOAL_POSITION).flat();
     p5.createCanvas(p5.windowWidth, p5.windowHeight);
     p5.clear(0, 0, 0, 0);
+    p5.translate(0, 0);
     drawWalls();
-    // p.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
-    // drawMaze(p, maze, TILE_SIZE);
+    p5.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
+    drawWalls();
   };
   p5.draw = () => {
     if (drawingIndex < bfsHistory.length) {
+      p5.translate(0, 0);
       p5.fill('yellow');
       drawTile(p5, bfsHistory[drawingIndex], TILE_SIZE);
+      drawFixedTiles();
+    }
+    if (drawingIndex < dfsHistory.length) {
+      p5.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
+      p5.fill('yellow');
+      drawTile(p5, dfsHistory[drawingIndex], TILE_SIZE);
+      drawFixedTiles();
     }
     drawingIndex += 1;
-    drawFixedPositions();
   };
   /* eslint-enable no-param-reassign */
 };
