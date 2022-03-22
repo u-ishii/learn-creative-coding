@@ -6,10 +6,9 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 import { Maze, Position } from '@/types/maze';
-import { addPositions, DIRECTIONS } from '@/utils/position-calculator';
 import { generateMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
-import { generate2dArray } from '@/utils/array-generator';
+import { solveBfs } from '@/utils/bfs-solver';
 
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
@@ -20,15 +19,13 @@ const GOAL_POSITION: Position = { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 };
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   let maze: Maze;
-  const pastPositions: Position[][] = [];
-  const visitedMaze: boolean[][] = generate2dArray(MAZE_HEIGHT, MAZE_WIDTH, false);
-  const drawInitial = (): void => {
+  let drawingIndex = 0;
+  let bfsHistory: Position[];
+  const drawWalls = (): void => {
     p5.fill('gray');
     drawMaze(p5, maze, TILE_SIZE);
   };
-  const drawProgress = (): void => {
-    p5.fill('yellow');
-    pastPositions.flat().forEach((position) => drawTile(p5, position, TILE_SIZE));
+  const drawFixedPositions = (): void => {
     p5.fill('blue');
     drawTile(p5, START_POSITION, TILE_SIZE);
     p5.fill('red');
@@ -36,29 +33,20 @@ const initializeP5 = (p5: P5) => {
   };
   p5.setup = () => {
     maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
+    bfsHistory = solveBfs(maze, START_POSITION, GOAL_POSITION).flat();
     p5.createCanvas(p5.windowWidth, p5.windowHeight);
     p5.clear(0, 0, 0, 0);
-    drawInitial();
-    drawProgress();
+    drawWalls();
     // p.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
     // drawMaze(p, maze, TILE_SIZE);
-    pastPositions.push([START_POSITION]);
   };
   p5.draw = () => {
-    if (!pastPositions) return;
-    if (visitedMaze[GOAL_POSITION.y][GOAL_POSITION.x]) return;
-    const aroundPositions = Array.from(new Set(
-      pastPositions[pastPositions.length - 1].flatMap(
-        (cursor) => DIRECTIONS.map(
-          (direction) => addPositions(cursor, direction),
-        ),
-      ),
-    ))
-      .filter((position) => maze[position.y][position.x] === 'floor')
-      .filter((position) => !visitedMaze[position.y][position.x]);
-    aroundPositions.forEach((position) => { visitedMaze[position.y][position.x] = true; });
-    pastPositions.push(aroundPositions);
-    drawProgress();
+    if (drawingIndex < bfsHistory.length) {
+      p5.fill('yellow');
+      drawTile(p5, bfsHistory[drawingIndex], TILE_SIZE);
+    }
+    drawingIndex += 1;
+    drawFixedPositions();
   };
   /* eslint-enable no-param-reassign */
 };
