@@ -20,7 +20,7 @@ const GOAL_POSITION: Position = { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 };
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   let maze: Maze;
-  let pastPositions: Position[][] = [];
+  const pastPositions: Position[][] = [];
   const visitedMaze: boolean[][] = generate2dArray(MAZE_HEIGHT, MAZE_WIDTH, false);
   const drawInitial = (): void => {
     p5.fill('gray');
@@ -42,10 +42,11 @@ const initializeP5 = (p5: P5) => {
     drawProgress();
     // p.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
     // drawMaze(p, maze, TILE_SIZE);
-    pastPositions = [[START_POSITION]];
+    pastPositions.push([START_POSITION]);
   };
   p5.draw = () => {
     if (!pastPositions) return;
+    if (visitedMaze[GOAL_POSITION.y][GOAL_POSITION.x]) return;
     const aroundPositions = Array.from(new Set(
       pastPositions[pastPositions.length - 1].flatMap(
         (cursor) => DIRECTIONS.map(
