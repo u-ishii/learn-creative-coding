@@ -20,18 +20,26 @@ const GOAL_POSITION: Position = { x: MAZE_WIDTH - 2, y: MAZE_HEIGHT - 2 };
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   let maze: Maze;
-  let pastPositions: Position[][];
+  let pastPositions: Position[][] = [];
   const visitedMaze: boolean[][] = generate2dArray(MAZE_HEIGHT, MAZE_WIDTH, false);
-  p5.setup = () => {
-    maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
-    p5.createCanvas(p5.windowWidth, p5.windowHeight);
-    p5.clear(0, 0, 0, 0);
+  const drawInitial = (): void => {
     p5.fill('gray');
     drawMaze(p5, maze, TILE_SIZE);
+  };
+  const drawProgress = (): void => {
+    p5.fill('yellow');
+    pastPositions.flat().forEach((position) => drawTile(p5, position, TILE_SIZE));
     p5.fill('blue');
     drawTile(p5, START_POSITION, TILE_SIZE);
     p5.fill('red');
     drawTile(p5, GOAL_POSITION, TILE_SIZE);
+  };
+  p5.setup = () => {
+    maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
+    p5.createCanvas(p5.windowWidth, p5.windowHeight);
+    p5.clear(0, 0, 0, 0);
+    drawInitial();
+    drawProgress();
     // p.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
     // drawMaze(p, maze, TILE_SIZE);
     pastPositions = [[START_POSITION]];
@@ -47,10 +55,9 @@ const initializeP5 = (p5: P5) => {
     ))
       .filter((position) => maze[position.y][position.x] === 'floor')
       .filter((position) => !visitedMaze[position.y][position.x]);
-    console.log(aroundPositions);
-    aroundPositions.forEach((position) => drawTile(p5, position, TILE_SIZE));
     aroundPositions.forEach((position) => { visitedMaze[position.y][position.x] = true; });
     pastPositions.push(aroundPositions);
+    drawProgress();
   };
   /* eslint-enable no-param-reassign */
 };
