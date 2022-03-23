@@ -6,10 +6,12 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 import { Position } from '@/types/maze';
+import { unique } from '@/utils/unique';
 import { generateMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
 import { solveBfs } from '@/utils/bfs-solver';
 import { solveDfs } from '@/utils/dfs-solver';
+import { findDfsRoute } from '@/utils/dfs-route-finder';
 
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
@@ -26,9 +28,16 @@ const GOAL_POSITION: Position = {
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   const maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
-  const bfsHistory = solveBfs(maze, START_POSITION, GOAL_POSITION).flat();
-  const dfsHistory = solveDfs(maze, START_POSITION, GOAL_POSITION).flat();
-  let drawingIndex = 0;
+  const bfsTree = solveBfs(maze, START_POSITION, GOAL_POSITION);
+  const dfsTree = solveDfs(maze, START_POSITION, GOAL_POSITION);
+  const bfsHistory = bfsTree.flat();
+  const dfsHistory = unique(dfsTree.flat(), (p) => p.x * MAZE_HEIGHT + p.y);
+  const dfsRoute = findDfsRoute(dfsTree);
+  console.log(dfsTree);
+  console.log(dfsHistory);
+  // console.log(dfsRoute);
+  let historyIndex = 1;
+  let routeIndex = 1;
   const drawWalls = (): void => {
     p5.fill('gray');
     drawMaze(p5, maze, TILE_SIZE);
@@ -39,28 +48,49 @@ const initializeP5 = (p5: P5) => {
     p5.fill('red');
     drawTile(p5, GOAL_POSITION, TILE_SIZE);
   };
+  const translateDfs = (): void => {
+    p5.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
+  };
   p5.setup = () => {
     p5.createCanvas(p5.windowWidth, p5.windowHeight);
     p5.clear(0, 0, 0, 0);
-    p5.translate(0, 0);
     drawWalls();
-    p5.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
+    translateDfs();
     drawWalls();
   };
   p5.draw = () => {
-    if (drawingIndex < bfsHistory.length) {
-      p5.translate(0, 0);
-      p5.fill('yellow');
-      drawTile(p5, bfsHistory[drawingIndex], TILE_SIZE);
-      drawFixedTiles();
+    drawFixedTiles();
+    p5.push();
+    translateDfs();
+    drawFixedTiles();
+    p5.pop();
+    const bfsHistoryDrawing = historyIndex < bfsHistory.length - 1;
+    const dfsHistoryDrawing = historyIndex < dfsHistory.length - 1;
+    p5.fill('yellow');
+    if (bfsHistoryDrawing) {
+      drawTile(p5, bfsHistory[historyIndex], TILE_SIZE);
     }
-    if (drawingIndex < dfsHistory.length) {
-      p5.translate((MAZE_WIDTH + 1) * TILE_SIZE, 0);
-      p5.fill('yellow');
-      drawTile(p5, dfsHistory[drawingIndex], TILE_SIZE);
-      drawFixedTiles();
+    if (dfsHistoryDrawing) {
+      p5.push();
+      translateDfs();
+      drawTile(p5, dfsHistory[historyIndex], TILE_SIZE);
+      p5.pop();
     }
-    drawingIndex += 1;
+    if (bfsHistoryDrawing || dfsHistoryDrawing) {
+      historyIndex += 1;
+      return;
+    }
+    const dfsRouteDrawing = routeIndex < dfsRoute.length - 1;
+    p5.fill('white');
+    if (dfsRouteDrawing) {
+      p5.push();
+      translateDfs();
+      drawTile(p5, dfsRoute[historyIndex], TILE_SIZE);
+      p5.pop();
+    }
+    if (dfsHistoryDrawing) {
+      routeIndex += 1;
+    }
   };
   /* eslint-enable no-param-reassign */
 };

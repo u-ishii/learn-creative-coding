@@ -7,6 +7,7 @@ export const solveDfs = (
     const visitedMaze: boolean[][] = generate2dArray(maze.length, maze[0].length, false);
     const loop = (current: Position): Position[][] => {
       visitedMaze[current.y][current.x] = true;
+      if (current.x === goalPosition.x && current.y === goalPosition.y) return [[current]];
       if (visitedMaze[goalPosition.y][goalPosition.x]) return [];
       const aroundPositions = DIRECTIONS
         .map((direction) => addPositions(current, direction))
@@ -15,8 +16,13 @@ export const solveDfs = (
       if (aroundPositions.length === 0) {
         return [[current]];
       }
-      return aroundPositions
-        .map((position) => [current, ...loop(position).flat()]);
+      // return aroundPositions
+      //   .map((position) => [current, ...loop(position).flat()]);
+      const tree: Position[][] = [];
+      aroundPositions.forEach((p) => {
+        tree.push(...loop(p).map((branch) => [current, ...branch]));
+      });
+      return tree;
     };
     return loop(startPosition);
   }
