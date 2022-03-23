@@ -33,9 +33,6 @@ const initializeP5 = (p5: P5) => {
   const bfsHistory = bfsTree.flat();
   const dfsHistory = unique(dfsTree.flat(), (p) => p.x * MAZE_HEIGHT + p.y);
   const dfsRoute = findDfsRoute(dfsTree);
-  console.log(dfsTree);
-  console.log(dfsHistory);
-  // console.log(dfsRoute);
   let historyIndex = 1;
   let routeIndex = 1;
   const drawWalls = (): void => {
@@ -66,7 +63,7 @@ const initializeP5 = (p5: P5) => {
     p5.pop();
     const bfsHistoryDrawing = historyIndex < bfsHistory.length - 1;
     const dfsHistoryDrawing = historyIndex < dfsHistory.length - 1;
-    p5.fill('yellow');
+    p5.fill('green');
     if (bfsHistoryDrawing) {
       drawTile(p5, bfsHistory[historyIndex], TILE_SIZE);
     }
@@ -81,14 +78,14 @@ const initializeP5 = (p5: P5) => {
       return;
     }
     const dfsRouteDrawing = routeIndex < dfsRoute.length - 1;
-    p5.fill('white');
+    p5.fill('yellow');
     if (dfsRouteDrawing) {
       p5.push();
       translateDfs();
-      drawTile(p5, dfsRoute[historyIndex], TILE_SIZE);
+      drawTile(p5, dfsRoute[routeIndex], TILE_SIZE);
       p5.pop();
     }
-    if (dfsHistoryDrawing) {
+    if (dfsRouteDrawing) {
       routeIndex += 1;
     }
   };
