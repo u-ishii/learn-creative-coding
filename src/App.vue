@@ -11,6 +11,7 @@ import { generateMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
 import { solveBfs } from '@/utils/bfs-solver';
 import { solveDfs } from '@/utils/dfs-solver';
+import { findBfsRoute } from '@/utils/bfs-route-finder';
 import { findDfsRoute } from '@/utils/dfs-route-finder';
 
 const MAZE_WIDTH = 59;
@@ -32,6 +33,7 @@ const initializeP5 = (p5: P5) => {
   const dfsTree = solveDfs(maze, START_POSITION, GOAL_POSITION);
   const bfsHistory = bfsTree.flat();
   const dfsHistory = unique(dfsTree.flat(), (p) => p.x * MAZE_HEIGHT + p.y);
+  const bfsRoute = findBfsRoute(bfsTree);
   const dfsRoute = findDfsRoute(dfsTree);
   let historyIndex = 1;
   let routeIndex = 1;
@@ -77,8 +79,12 @@ const initializeP5 = (p5: P5) => {
       historyIndex += 1;
       return;
     }
+    const bfsRouteDrawing = routeIndex < bfsRoute.length - 1;
     const dfsRouteDrawing = routeIndex < dfsRoute.length - 1;
     p5.fill('yellow');
+    if (bfsRouteDrawing) {
+      drawTile(p5, bfsRoute[routeIndex], TILE_SIZE);
+    }
     if (dfsRouteDrawing) {
       p5.push();
       translateDfs();
