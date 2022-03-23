@@ -3,12 +3,12 @@ import { addPositions, DIRECTIONS } from '@/utils/position-calculator';
 import { generate2dArray } from './array-generator';
 
 export const solveDfs = (
-  (maze: Maze, startPosition: Position, goalPosition: Position): Position[][] => {
+  (maze: Maze, start: Position, goal: Position): Position[][] => {
     const visitedMaze: boolean[][] = generate2dArray(maze.length, maze[0].length, false);
     const loop = (current: Position): Position[][] => {
       visitedMaze[current.y][current.x] = true;
-      if (current.x === goalPosition.x && current.y === goalPosition.y) return [[current]];
-      if (visitedMaze[goalPosition.y][goalPosition.x]) return [];
+      if (current.x === goal.x && current.y === goal.y) return [[current]];
+      if (visitedMaze[goal.y][goal.x]) return [];
       const aroundPositions = DIRECTIONS
         .map((direction) => addPositions(current, direction))
         .filter((position) => maze[position.y][position.x] === 'floor')
@@ -24,6 +24,6 @@ export const solveDfs = (
       });
       return tree;
     };
-    return loop(startPosition);
+    return loop(start);
   }
 );
