@@ -8,10 +8,8 @@ import P5 from 'p5';
 import { Position } from '@/types/maze';
 import { generateMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
-import { solveBfs } from '@/utils/bfs-solver';
-import { solveDfs } from '@/utils/dfs-solver';
-import { findBfsRoute } from '@/utils/bfs-route-finder';
-import { NodeStack } from '@/types/node-iterator';
+import { solveMaze } from '@/utils/maze-solver';
+import { NodeStack, NodeQueue } from '@/types/node-iterator';
 
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
@@ -28,12 +26,12 @@ const GOAL_POSITION: Position = {
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   const maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
-  const bfsTree = solveBfs(maze, START_POSITION, GOAL_POSITION);
-  const [dfsRoute, dfsHistory] = (
-    solveDfs(maze, START_POSITION, GOAL_POSITION, () => new NodeStack())
+  const [bfsRoute, bfsHistory] = (
+    solveMaze(maze, START_POSITION, GOAL_POSITION, () => new NodeQueue())
   );
-  const bfsHistory = bfsTree.flat();
-  const bfsRoute = findBfsRoute(bfsTree);
+  const [dfsRoute, dfsHistory] = (
+    solveMaze(maze, START_POSITION, GOAL_POSITION, () => new NodeStack())
+  );
   let historyIndex = 1;
   let routeIndex = 1;
   const drawWalls = (): void => {

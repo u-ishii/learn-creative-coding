@@ -3,7 +3,7 @@ import { Node, NodeIterator } from '@/types/node-iterator';
 import { addPositions, DIRECTIONS } from '@/utils/position-calculator';
 import { generate2dArray } from './array-generator';
 
-export const solveDfs = (
+export const solveMaze = (
   (maze: Maze, start: Position, goal: Position, createFrontier: () => NodeIterator<Position>)
   : [Position[], Position[]] => {
     const frontier = createFrontier();

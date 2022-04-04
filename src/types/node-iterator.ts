@@ -21,6 +21,22 @@ export class NodeStack<T> implements NodeIterator<T> {
   }
 }
 
+export class NodeQueue<T> implements NodeIterator<T> {
+  private nodes: Node<T>[] = [];
+
+  push(node: Node<T>): void {
+    this.nodes.push(node);
+  }
+
+  pop(): Node<T> | null {
+    return castAsNull(this.nodes.shift());
+  }
+
+  isEmpty(): boolean {
+    return this.nodes.length === 0;
+  }
+}
+
 export class Node<T> {
   // eslint-disable-next-line no-useless-constructor
   constructor(
