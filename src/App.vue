@@ -6,13 +6,12 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 import { Position } from '@/types/maze';
-import { unique } from '@/utils/unique';
 import { generateMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
 import { solveBfs } from '@/utils/bfs-solver';
 import { solveDfs } from '@/utils/dfs-solver';
 import { findBfsRoute } from '@/utils/bfs-route-finder';
-import { findDfsRoute } from '@/utils/dfs-route-finder';
+import { NodeStack } from '@/types/node-iterator';
 
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
@@ -30,11 +29,11 @@ const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   const maze = generateMaze(MAZE_WIDTH, MAZE_HEIGHT);
   const bfsTree = solveBfs(maze, START_POSITION, GOAL_POSITION);
-  const dfsTree = solveDfs(maze, START_POSITION, GOAL_POSITION);
+  const [dfsRoute, dfsHistory] = (
+    solveDfs(maze, START_POSITION, GOAL_POSITION, () => new NodeStack())
+  );
   const bfsHistory = bfsTree.flat();
-  const dfsHistory = unique(dfsTree.flat(), (p) => p.x * MAZE_HEIGHT + p.y);
   const bfsRoute = findBfsRoute(bfsTree);
-  const dfsRoute = findDfsRoute(dfsTree);
   let historyIndex = 1;
   let routeIndex = 1;
   const drawWalls = (): void => {

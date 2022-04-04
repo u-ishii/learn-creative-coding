@@ -1,29 +1,40 @@
 import { Position, Maze } from '@/types/maze';
+import { Node, NodeIterator } from '@/types/node-iterator';
 import { addPositions, DIRECTIONS } from '@/utils/position-calculator';
 import { generate2dArray } from './array-generator';
 
 export const solveDfs = (
-  (maze: Maze, start: Position, goal: Position): Position[][] => {
+  (maze: Maze, start: Position, goal: Position, createFrontier: () => NodeIterator<Position>)
+  : [Position[], Position[]] => {
+    const frontier = createFrontier();
+    frontier.push(new Node(start, null));
     const visitedMaze: boolean[][] = generate2dArray(maze.length, maze[0].length, false);
-    const loop = (current: Position): Position[][] => {
-      visitedMaze[current.y][current.x] = true;
-      if (current.x === goal.x && current.y === goal.y) return [[current]];
-      if (visitedMaze[goal.y][goal.x]) return [];
+    const history: Position[] = [];
+    while (!frontier.isEmpty() && history.length < 10000) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const current = frontier.pop()!;
+      visitedMaze[current.state.y][current.state.x] = true;
+      history.push(current.state);
+      if (current.state.x === goal.x && current.state.y === goal.y) {
+        return [extractRoute(current), history];
+      }
       const aroundPositions = DIRECTIONS
-        .map((direction) => addPositions(current, direction))
+        .map((direction) => addPositions(current.state, direction))
         .filter((position) => maze[position.y][position.x] === 'floor')
         .filter((position) => !visitedMaze[position.y][position.x]);
-      if (aroundPositions.length === 0) {
-        return [[current]];
-      }
-      // return aroundPositions
-      //   .map((position) => [current, ...loop(position).flat()]);
-      const tree: Position[][] = [];
-      aroundPositions.forEach((p) => {
-        tree.push(...loop(p).map((branch) => [current, ...branch]));
-      });
-      return tree;
-    };
-    return loop(start);
+      aroundPositions
+        .forEach((position) => frontier.push(new Node(position, current)));
+    }
+    throw new Error('ROUTE_NOT_FOUND');
   }
 );
+
+const extractRoute = (node: Node<Position>): Position[] => {
+  let current: Node<Position> | null = node;
+  const route: Position[] = [];
+  while (current != null) {
+    route.push(current.state);
+    current = current.parent;
+  }
+  return route.reverse();
+};
