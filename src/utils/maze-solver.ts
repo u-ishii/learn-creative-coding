@@ -25,7 +25,7 @@ export const solveMaze = (
       aroundPositions
         .forEach((position) => frontier.push(new Node(position, current)));
     }
-    throw new Error('ROUTE_NOT_FOUND');
+    return [[], history];
   }
 );
 
