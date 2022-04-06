@@ -1,5 +1,6 @@
 import { Position, Maze } from '@/types/maze';
-import { Node, NodeIterator } from '@/types/node-iterator';
+import { Node } from '@/types/node';
+import { Iterator } from '@/types/iterator';
 import { addPositions, DIRECTIONS } from '@/utils/position-calculator';
 import { generate2dArray } from './array-generator';
 
@@ -9,7 +10,7 @@ export interface Solution {
 }
 
 export const solveMaze = (
-  (maze: Maze, start: Position, goal: Position, createFrontier: () => NodeIterator<Position>)
+  (maze: Maze, start: Position, goal: Position, createFrontier: () => Iterator<Node<Position>>)
   : Solution => {
     const frontier = createFrontier();
     frontier.push(new Node(start, null));

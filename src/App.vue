@@ -9,7 +9,7 @@ import { Position, Maze } from '@/types/maze';
 import { generateDiggedMaze, generatePutMaze } from '@/utils/maze-generator';
 import { drawMaze, drawTile } from '@/utils/maze-drawer';
 import { solveMaze, Solution } from '@/utils/maze-solver';
-import { NodeStack, NodeQueue } from '@/types/node-iterator';
+import { Stack, Queue } from '@/types/iterator';
 
 const MAZE_WIDTH = 59;
 const MAZE_HEIGHT = 41;
@@ -36,22 +36,22 @@ const initializeP5 = (p5: P5) => {
   const experiments: Experiment[] = [
     {
       maze: diggedMaze,
-      solution: solveMaze(diggedMaze, START_POSITION, GOAL_POSITION, () => new NodeQueue()),
+      solution: solveMaze(diggedMaze, START_POSITION, GOAL_POSITION, () => new Queue()),
       transform: { x: 0, y: 0 },
     },
     {
       maze: diggedMaze,
-      solution: solveMaze(diggedMaze, START_POSITION, GOAL_POSITION, () => new NodeStack()),
+      solution: solveMaze(diggedMaze, START_POSITION, GOAL_POSITION, () => new Stack()),
       transform: { x: 1, y: 0 },
     },
     {
       maze: putMaze,
-      solution: solveMaze(putMaze, START_POSITION, GOAL_POSITION, () => new NodeQueue()),
+      solution: solveMaze(putMaze, START_POSITION, GOAL_POSITION, () => new Queue()),
       transform: { x: 0, y: 1 },
     },
     {
       maze: putMaze,
-      solution: solveMaze(putMaze, START_POSITION, GOAL_POSITION, () => new NodeStack()),
+      solution: solveMaze(putMaze, START_POSITION, GOAL_POSITION, () => new Stack()),
       transform: { x: 1, y: 1 },
     },
   ];
