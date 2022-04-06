@@ -14,7 +14,7 @@ const dig = (cursor: Position, maze: Maze, width: number, height: number)
     ))
 );
 
-export const generateMaze = (width: number, height: number): Maze => {
+export const generateDiggedMaze = (width: number, height: number): Maze => {
   const maze = generate2dArray<Cell>(height, width, 'wall');
   const routes: Position[] = [];
   const start: Position = {
@@ -24,7 +24,8 @@ export const generateMaze = (width: number, height: number): Maze => {
   maze[start.y][start.x] = 'floor';
   routes.push(start);
   while (routes.length > 0) {
-    const next = routes.pop() as Position;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const next = routes.pop()!;
     const floors = dig(next, maze, width, height);
     if (floors) {
       maze[floors[0].y][floors[0].x] = 'floor';
@@ -35,3 +36,26 @@ export const generateMaze = (width: number, height: number): Maze => {
   }
   return maze;
 };
+
+export const generatePutMaze = (
+  (width: number, height: number, reserved: Position[], probability: number): Maze => {
+    const maze = generate2dArray<Cell>(height, width, 'floor');
+    for (let y = 0; y < height; y += 1) {
+      maze[y][0] = 'wall';
+      maze[y][width - 1] = 'wall';
+    }
+    for (let x = 0; x < width; x += 1) {
+      maze[0][x] = 'wall';
+      maze[height - 1][x] = 'wall';
+    }
+    for (let y = 1; y < height - 1; y += 1) {
+      for (let x = 1; x < width - 1; x += 1) {
+        if (Math.random() <= probability) {
+          maze[y][x] = 'wall';
+        }
+      }
+    }
+    reserved.forEach((p) => { maze[p.y][p.x] = 'floor'; });
+    return maze;
+  }
+);

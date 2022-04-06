@@ -3,19 +3,25 @@ import { Node, NodeIterator } from '@/types/node-iterator';
 import { addPositions, DIRECTIONS } from '@/utils/position-calculator';
 import { generate2dArray } from './array-generator';
 
+export interface Solution {
+  route: Position[];
+  history: Position[];
+}
+
 export const solveMaze = (
   (maze: Maze, start: Position, goal: Position, createFrontier: () => NodeIterator<Position>)
-  : [Position[], Position[]] => {
+  : Solution => {
     const frontier = createFrontier();
     frontier.push(new Node(start, null));
     const visitedMaze: boolean[][] = generate2dArray(maze.length, maze[0].length, false);
+    visitedMaze[start.y][start.x] = true;
     const history: Position[] = [];
     while (!frontier.isEmpty() && history.length < 10000) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const current = frontier.pop()!;
       history.push(current.state);
       if (current.state.x === goal.x && current.state.y === goal.y) {
-        return [extractRoute(current), history];
+        return { route: extractRoute(current), history };
       }
       const aroundPositions = DIRECTIONS
         .map((direction) => addPositions(current.state, direction))
@@ -30,7 +36,7 @@ export const solveMaze = (
           frontier.push(new Node(position, current));
         });
     }
-    return [[], history];
+    return { route: [], history };
   }
 );
 
