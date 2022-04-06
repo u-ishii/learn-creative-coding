@@ -5,19 +5,27 @@ export interface Iterator<T> {
     isEmpty(): boolean;
 }
 
+interface Element<T> {
+  value: T;
+  before: Element<T> | null;
+}
+
 export class Stack<T> implements Iterator<T> {
-  private values: T[] = [];
+  private last: Element<T> | null = null;
 
   push(value: T): void {
-    this.values.push(value);
+    const last = { value, before: this.last };
+    this.last = last;
   }
 
   pop(): T | null {
-    return castAsNull(this.values.pop());
+    const popped = this.last;
+    this.last = this.last?.before ?? null;
+    return popped?.value ?? null;
   }
 
   isEmpty(): boolean {
-    return this.values.length === 0;
+    return this.last === null;
   }
 }
 
@@ -37,4 +45,4 @@ export class Queue<T> implements Iterator<T> {
   }
 }
 
-const castAsNull = <T, > (value: T | undefined): T | null => (value === undefined ? null : value);
+const castAsNull = <T, > (value: T | undefined): T | null => value ?? null;
