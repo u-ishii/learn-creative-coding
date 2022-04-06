@@ -13,7 +13,6 @@ export const solveMaze = (
     while (!frontier.isEmpty() && history.length < 10000) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const current = frontier.pop()!;
-      visitedMaze[current.state.y][current.state.x] = true;
       history.push(current.state);
       if (current.state.x === goal.x && current.state.y === goal.y) {
         return [extractRoute(current), history];
@@ -23,7 +22,13 @@ export const solveMaze = (
         .filter((position) => maze[position.y][position.x] === 'floor')
         .filter((position) => !visitedMaze[position.y][position.x]);
       aroundPositions
-        .forEach((position) => frontier.push(new Node(position, current)));
+        .forEach((position) => {
+          if (visitedMaze[position.y][position.x]) {
+            return;
+          }
+          visitedMaze[position.y][position.x] = true;
+          frontier.push(new Node(position, current));
+        });
     }
     return [[], history];
   }
