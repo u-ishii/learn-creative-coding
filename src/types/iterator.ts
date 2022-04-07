@@ -20,8 +20,11 @@ export class Stack<T> implements Iterator<T> {
 
   pop(): T | null {
     const popped = this.last;
-    this.last = this.last?.before ?? null;
-    return popped?.value ?? null;
+    if (!popped) {
+      return null;
+    }
+    this.last = popped.before;
+    return popped.value;
   }
 
   isEmpty(): boolean {
