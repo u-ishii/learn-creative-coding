@@ -10,6 +10,12 @@ interface Element<T> {
   next: Element<T> | null;
 }
 
+interface BiElement<T> {
+  value: T;
+  prev: BiElement<T> | null;
+  next: BiElement<T> | null;
+}
+
 export class Stack<T> implements Iterator<T> {
   private head: Element<T> | null = null;
 
@@ -33,29 +39,36 @@ export class Stack<T> implements Iterator<T> {
 }
 
 export class Queue<T> implements Iterator<T> {
-  private head: Element<T> | null = null;
+  private head: BiElement<T> | null = null;
+
+  private last: BiElement<T> | null = null;
 
   push(value: T): void {
-    const head = { value, next: this.head };
+    if (this.isEmpty()) {
+      const head = { value, prev: null, next: null };
+      this.head = head;
+      this.last = head;
+      return;
+    }
+    const head = { value, prev: null, next: this.head };
+    if (head.next) {
+      head.next.prev = head;
+    }
     this.head = head;
   }
 
   pop(): T | null {
-    const { head } = this;
-    if (!head) {
+    const { last } = this;
+    if (!last) {
       return null;
     }
-    if (!head.next) {
+    if (!last.prev) {
       this.head = null;
-      return head.value;
+      this.last = null;
+      return last.value;
     }
-    let beforeLast = head;
-    let last = head.next;
-    while (last.next) {
-      beforeLast = last;
-      last = last.next;
-    }
-    beforeLast.next = null;
+    last.prev.next = null;
+    this.last = last.prev;
     return last.value;
   }
 
