@@ -7,45 +7,59 @@ export interface Iterator<T> {
 
 interface Element<T> {
   value: T;
-  before: Element<T> | null;
+  next: Element<T> | null;
 }
 
 export class Stack<T> implements Iterator<T> {
-  private last: Element<T> | null = null;
+  private head: Element<T> | null = null;
 
   push(value: T): void {
-    const last = { value, before: this.last };
-    this.last = last;
+    const head = { value, next: this.head };
+    this.head = head;
   }
 
   pop(): T | null {
-    const popped = this.last;
+    const popped = this.head;
     if (!popped) {
       return null;
     }
-    this.last = popped.before;
+    this.head = popped.next;
     return popped.value;
   }
 
   isEmpty(): boolean {
-    return this.last === null;
+    return this.head === null;
   }
 }
 
 export class Queue<T> implements Iterator<T> {
-  private values: T[] = [];
+  private head: Element<T> | null = null;
 
   push(value: T): void {
-    this.values.push(value);
+    const head = { value, next: this.head };
+    this.head = head;
   }
 
   pop(): T | null {
-    return castAsNull(this.values.shift());
+    const { head } = this;
+    if (!head) {
+      return null;
+    }
+    if (!head.next) {
+      this.head = null;
+      return head.value;
+    }
+    let beforeLast = head;
+    let last = head.next;
+    while (last.next) {
+      beforeLast = last;
+      last = last.next;
+    }
+    beforeLast.next = null;
+    return last.value;
   }
 
   isEmpty(): boolean {
-    return this.values.length === 0;
+    return this.head === null;
   }
 }
-
-const castAsNull = <T, > (value: T | undefined): T | null => value ?? null;
