@@ -15,11 +15,15 @@ export const solveMaze = (
     const frontier = createFrontier();
     frontier.push(new Node(start, null));
     const visitedMaze: boolean[][] = generate2dArray(maze.length, maze[0].length, false);
-    visitedMaze[start.y][start.x] = true;
     const history: Position[] = [];
     while (!frontier.isEmpty() && history.length < 10000) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const current = frontier.pop()!;
+      if (visitedMaze[current.state.y][current.state.x]) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      visitedMaze[current.state.y][current.state.x] = true;
       history.push(current.state);
       if (current.state.x === goal.x && current.state.y === goal.y) {
         return { route: extractRoute(current), history };
@@ -29,13 +33,7 @@ export const solveMaze = (
         .filter((position) => maze[position.y][position.x] === 'floor')
         .filter((position) => !visitedMaze[position.y][position.x]);
       aroundPositions
-        .forEach((position) => {
-          if (visitedMaze[position.y][position.x]) {
-            return;
-          }
-          visitedMaze[position.y][position.x] = true;
-          frontier.push(new Node(position, current));
-        });
+        .forEach((position) => { frontier.push(new Node(position, current)); });
     }
     return { route: [], history };
   }

@@ -34,7 +34,7 @@ interface Experiment {
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   const diggedMaze = generateDiggedMaze(MAZE_WIDTH, MAZE_HEIGHT);
-  const putMaze = generatePutMaze(MAZE_WIDTH, MAZE_HEIGHT, [START_POSITION, GOAL_POSITION], 0.1);
+  const putMaze = generatePutMaze(MAZE_WIDTH, MAZE_HEIGHT, [START_POSITION, GOAL_POSITION], 0.3);
   const experiments: Experiment[] = [
     {
       maze: diggedMaze,
@@ -65,15 +65,19 @@ const initializeP5 = (p5: P5) => {
     p5.fill('red');
     drawTile(p5, GOAL_POSITION, TILE_SIZE);
   };
+  const translateExperiment = (experiment: Experiment) => {
+    p5.translate(
+      (MAZE_WIDTH + 1) * experiment.transform.x * TILE_SIZE + TILE_SIZE,
+      (MAZE_HEIGHT + 1) * experiment.transform.y * TILE_SIZE + TILE_SIZE,
+    );
+  };
   p5.setup = () => {
+    p5.frameRate(10);
     p5.createCanvas(p5.windowWidth, p5.windowHeight);
     p5.clear(0, 0, 0, 0);
     experiments.forEach((experiment) => {
       p5.push();
-      p5.translate(
-        (MAZE_WIDTH + 1) * experiment.transform.x * TILE_SIZE,
-        (MAZE_HEIGHT + 1) * experiment.transform.y * TILE_SIZE,
-      );
+      translateExperiment(experiment);
       p5.fill('gray');
       drawMaze(p5, experiment.maze, TILE_SIZE);
       drawFixedTiles();
@@ -90,10 +94,7 @@ const initializeP5 = (p5: P5) => {
     }
     experiments.forEach((experiment) => {
       p5.push();
-      p5.translate(
-        (MAZE_WIDTH + 1) * experiment.transform.x * TILE_SIZE,
-        (MAZE_HEIGHT + 1) * experiment.transform.y * TILE_SIZE,
-      );
+      translateExperiment(experiment);
       if (isHistoryDrawing && historyIndex < experiment.solution.history.length - 1) {
         p5.fill('green');
         drawTile(p5, experiment.solution.history[historyIndex], TILE_SIZE);
