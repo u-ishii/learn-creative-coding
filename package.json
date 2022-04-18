@@ -5,13 +5,15 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "jest"
   },
   "dependencies": {
     "p5": "^1.4.1",
     "vue": "^3.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^27.4.1",
     "@types/p5": "^1.4.1",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
@@ -23,7 +25,9 @@
     "@vue/eslint-config-typescript": "^7.0.0",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^26.1.4",
     "eslint-plugin-vue": "^7.0.0",
+    "jest": "^27.5.1",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "typescript": "~4.1.5"
@@ -31,7 +35,8 @@
   "eslintConfig": {
     "root": true,
     "env": {
-      "node": true
+      "node": true,
+      "jest/globals": true
     },
     "extends": [
       "plugin:vue/vue3-essential",
@@ -41,6 +46,7 @@
     "parserOptions": {
       "ecmaVersion": 2020
     },
+    "plugins": ["jest"],
     "rules": {
       "import/prefer-default-export": "off",
       "no-use-before-define": "off"
