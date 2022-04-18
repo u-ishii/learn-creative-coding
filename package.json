@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "test": "jest"
+    "test": "vue-cli-service test:unit"
   },
   "dependencies": {
     "p5": "^1.4.1",
@@ -19,6 +19,7 @@
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-eslint": "~4.5.13",
     "@vue/cli-plugin-typescript": "~4.5.13",
+    "@vue/cli-plugin-unit-jest": "^5.0.4",
     "@vue/cli-service": "~4.5.13",
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-airbnb": "^5.0.2",
@@ -30,6 +31,7 @@
     "jest": "^27.5.1",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
+    "ts-jest": "^27.1.4",
     "typescript": "~4.1.5"
   },
   "eslintConfig": {
@@ -46,7 +48,9 @@
     "parserOptions": {
       "ecmaVersion": 2020
     },
-    "plugins": ["jest"],
+    "plugins": [
+      "jest"
+    ],
     "rules": {
       "import/prefer-default-export": "off",
       "no-use-before-define": "off"

@@ -11,16 +11,18 @@ import { drawMaze, drawTile } from '@/utils/maze-drawer';
 import { solveMaze, Solution } from '@/utils/maze-solver';
 import { Stack, Queue } from '@/types/iterator';
 
-const MAZE_WIDTH = 59;
-const MAZE_HEIGHT = 41;
+const MAZE_WIDTH = 25;
+const MAZE_HEIGHT = 25;
+// const MAZE_WIDTH = 59;
+// const MAZE_HEIGHT = 41;
 const TILE_SIZE = 10;
 const START_POSITION: Position = {
-  x: Math.floor(MAZE_WIDTH / 3),
-  y: Math.floor(MAZE_HEIGHT / 3),
+  x: Math.ceil(MAZE_WIDTH / 4),
+  y: Math.ceil(MAZE_HEIGHT / 4),
 };
 const GOAL_POSITION: Position = {
-  x: MAZE_WIDTH - Math.floor(MAZE_WIDTH / 3) - 1,
-  y: MAZE_HEIGHT - Math.floor(MAZE_HEIGHT / 3) - 1,
+  x: MAZE_WIDTH - Math.floor(MAZE_WIDTH / 4),
+  y: MAZE_HEIGHT - Math.floor(MAZE_HEIGHT / 4),
 };
 
 interface Experiment {
@@ -32,7 +34,7 @@ interface Experiment {
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   const diggedMaze = generateDiggedMaze(MAZE_WIDTH, MAZE_HEIGHT);
-  const putMaze = generatePutMaze(MAZE_WIDTH, MAZE_HEIGHT, [START_POSITION, GOAL_POSITION], 0.3);
+  const putMaze = generatePutMaze(MAZE_WIDTH, MAZE_HEIGHT, [START_POSITION, GOAL_POSITION], 0.1);
   const experiments: Experiment[] = [
     {
       maze: diggedMaze,
