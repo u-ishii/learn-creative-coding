@@ -11,18 +11,16 @@ import { drawMaze, drawTile } from '@/utils/maze-drawer';
 import { solveMaze, Solution } from '@/utils/maze-solver';
 import { Stack, Queue } from '@/types/iterator';
 
-const MAZE_WIDTH = 25;
-const MAZE_HEIGHT = 25;
-// const MAZE_WIDTH = 59;
-// const MAZE_HEIGHT = 41;
+const MAZE_WIDTH = 21;
+const MAZE_HEIGHT = 21;
 const TILE_SIZE = 10;
 const START_POSITION: Position = {
-  x: Math.ceil(MAZE_WIDTH / 4),
-  y: Math.ceil(MAZE_HEIGHT / 4),
+  x: Math.ceil(MAZE_WIDTH / 4) + 1,
+  y: Math.ceil(MAZE_HEIGHT / 4) + 1,
 };
 const GOAL_POSITION: Position = {
-  x: MAZE_WIDTH - Math.floor(MAZE_WIDTH / 4),
-  y: MAZE_HEIGHT - Math.floor(MAZE_HEIGHT / 4),
+  x: MAZE_WIDTH - Math.floor(MAZE_WIDTH / 4) - 1,
+  y: MAZE_HEIGHT - Math.floor(MAZE_HEIGHT / 4) - 1,
 };
 
 interface Experiment {
@@ -38,22 +36,22 @@ const initializeP5 = (p5: P5) => {
   const experiments: Experiment[] = [
     {
       maze: diggedMaze,
-      solution: solveMaze(diggedMaze, START_POSITION, GOAL_POSITION, () => new Queue()),
+      solution: solveMaze(diggedMaze, START_POSITION, GOAL_POSITION, () => new Stack()),
       transform: { x: 0, y: 0 },
     },
     {
       maze: diggedMaze,
-      solution: solveMaze(diggedMaze, START_POSITION, GOAL_POSITION, () => new Stack()),
+      solution: solveMaze(diggedMaze, START_POSITION, GOAL_POSITION, () => new Queue()),
       transform: { x: 1, y: 0 },
     },
     {
       maze: putMaze,
-      solution: solveMaze(putMaze, START_POSITION, GOAL_POSITION, () => new Queue()),
+      solution: solveMaze(putMaze, START_POSITION, GOAL_POSITION, () => new Stack()),
       transform: { x: 0, y: 1 },
     },
     {
       maze: putMaze,
-      solution: solveMaze(putMaze, START_POSITION, GOAL_POSITION, () => new Stack()),
+      solution: solveMaze(putMaze, START_POSITION, GOAL_POSITION, () => new Queue()),
       transform: { x: 1, y: 1 },
     },
   ];
@@ -96,8 +94,12 @@ const initializeP5 = (p5: P5) => {
       p5.push();
       translateExperiment(experiment);
       if (isHistoryDrawing && historyIndex < experiment.solution.history.length - 1) {
-        p5.fill('green');
+        p5.fill('white');
         drawTile(p5, experiment.solution.history[historyIndex], TILE_SIZE);
+      }
+      if (historyIndex > 1 && historyIndex < experiment.solution.history.length) {
+        p5.fill('green');
+        drawTile(p5, experiment.solution.history[historyIndex - 1], TILE_SIZE);
       }
       if (isRouteDrawing && routeIndex < experiment.solution.route.length - 1) {
         p5.fill('yellow');
