@@ -15,50 +15,71 @@ interface Capital {
   y: number;
 }
 
+type Edge = [number, number];
+type Graph = Edge[];
+
+const WIDTH = 1000;
+const HEIGHT = 500;
+
 const readCapitals = (p5: P5): Capital[] => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rows = Papa.parse<Record<string, any>>(CAPITALS_TEXT, { header: true, dynamicTyping: true, delimiter: '\t' }).data;
   return rows
     .map((row) => ({
       name: row.name_ens,
-      x: Math.floor(p5.map(row.lon, -180, 180, 0, p5.width)),
-      y: Math.floor(p5.map(row.lat * -1, -90, 90, 0, p5.height)),
+      x: Math.floor(p5.map(row.lon, -180, 180, 0, WIDTH)),
+      y: Math.floor(p5.map(row.lat * -1, -90, 90, 0, HEIGHT)),
     }));
 };
 
-const generateMst = (capitals: Capital[], distances: number[][]): [number, number][] => {
+const thinOutCapitals = (capitals: Capital[]): Capital[] => {
+  const step = 20;
+  return Lodash.range(0, WIDTH, step).flatMap((gridX) => (
+    Lodash.range(0, HEIGHT, step).flatMap((gridY) => {
+      const gridCapitals = capitals.filter((capital) => (
+        capital.x >= gridX && capital.x < gridX + step
+        && capital.y >= gridY && capital.y < gridY + step
+      ));
+      return gridCapitals.length > 0 ? gridCapitals[0] : [];
+    })
+  ));
+};
+
+const generateMst = (capitals: Capital[], distances: number[][]): Graph => {
   const appendedIndices = [0];
   const restIndices = new Set([...Array(capitals.length).keys()]);
-  const tree: [number, number][] = [];
+  const graph: Edge[] = [];
   while (restIndices.size > 0) {
-    const candidateIndices = appendedIndices.flatMap((i) => (
+    const candidateEdges = appendedIndices.flatMap((i) => (
       [...restIndices].map((j) => (
-        [i, j] as [number, number]
+        [i, j] as Edge
       ))
     ));
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const [nearestAppendedIndex, nearestRestIndex] = (
-      Lodash.minBy(candidateIndices, ([i, j]) => distances[i][j])
+      Lodash.minBy(candidateEdges, ([i, j]) => distances[i][j])
     )!;
     appendedIndices.push(nearestRestIndex);
     restIndices.delete(nearestRestIndex);
-    tree.push([nearestAppendedIndex, nearestRestIndex]);
+    graph.push([nearestAppendedIndex, nearestRestIndex]);
   }
-  return tree;
+  return graph;
 };
 
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
+  let capitals: Capital[] = [];
+  let graph: Graph = [];
   p5.setup = () => {
-    p5.createCanvas(1000, 500);
-    const capitals = readCapitals(p5);
+    p5.createCanvas(WIDTH, HEIGHT);
+    capitals = thinOutCapitals(readCapitals(p5));
     p5.clear(0, 0, 0, 0);
     const distances = capitals.map((a) => (
       capitals.map((b) => (
         Math.floor(Math.sqrt(Math.abs(a.x - b.x) ** 2 + Math.abs(a.y - b.y) ** 2))
       ))
     ));
-    const graph = generateMst(capitals, distances);
+    graph = generateMst(capitals, distances);
     p5.stroke(0);
     p5.fill('white');
     capitals
