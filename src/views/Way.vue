@@ -70,8 +70,10 @@ const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   let capitals: Capital[] = [];
   let graph: Graph = [];
+  let drawingGraphIndex = 0;
   p5.setup = () => {
     p5.createCanvas(WIDTH, HEIGHT);
+    p5.frameRate(10);
     capitals = thinOutCapitals(readCapitals(p5));
     p5.clear(0, 0, 0, 0);
     const distances = capitals.map((a) => (
@@ -80,19 +82,34 @@ const initializeP5 = (p5: P5) => {
       ))
     ));
     graph = generateMst(capitals, distances);
+  };
+  p5.draw = () => {
+    if (drawingGraphIndex >= graph.length) {
+      return;
+    }
+    const [a, b] = graph[drawingGraphIndex];
+    p5.push();
+    p5.strokeWeight(2);
+    p5.stroke('yellow');
+    p5.line(capitals[a].x, capitals[a].y, capitals[b].x, capitals[b].y);
+    p5.pop();
+    p5.push();
     p5.stroke(0);
     p5.fill('white');
     capitals
       .forEach((capital) => {
         p5.circle(capital.x, capital.y, 10);
       });
-    p5.stroke('yellow');
-    graph.forEach(([a, b]) => {
-      p5.line(capitals[a].x, capitals[a].y, capitals[b].x, capitals[b].y);
+    p5.pop();
+    p5.push();
+    p5.fill('green');
+    Lodash.range(0, drawingGraphIndex + 1).forEach((i) => {
+      const capital = capitals[graph[i][1]];
+      p5.circle(capital.x, capital.y, 10);
     });
+    p5.pop();
+    drawingGraphIndex += 1;
   };
-  // p5.draw = () => {
-  // };
   /* eslint-enable no-param-reassign */
 };
 
