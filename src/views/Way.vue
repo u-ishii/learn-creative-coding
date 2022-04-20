@@ -95,14 +95,14 @@ const initializeP5 = (p5: P5) => {
     p5.pop();
     p5.push();
     p5.stroke(0);
-    p5.fill('white');
+    p5.fill('green');
     capitals
       .forEach((capital) => {
         p5.circle(capital.x, capital.y, 10);
       });
     p5.pop();
     p5.push();
-    p5.fill('green');
+    p5.fill('white');
     Lodash.range(0, drawingGraphIndex + 1).forEach((i) => {
       const capital = capitals[graph[i][1]];
       p5.circle(capital.x, capital.y, 10);
