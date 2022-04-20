@@ -6,6 +6,7 @@
 import { defineComponent } from 'vue';
 import P5 from 'p5';
 import * as Papa from 'papaparse';
+import * as Lodash from 'lodash-es';
 import { CAPITALS_TEXT } from '@/data/capitals';
 
 interface Capital {
@@ -13,10 +14,6 @@ interface Capital {
   x: number;
   y: number;
 }
-
-// const mst = () => {
-
-// };
 
 const readCapitals = (p5: P5): Capital[] => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,22 +26,49 @@ const readCapitals = (p5: P5): Capital[] => {
     }));
 };
 
+const generateMst = (capitals: Capital[], distances: number[][]): [number, number][] => {
+  const appendedIndices = [0];
+  const restIndices = new Set([...Array(capitals.length).keys()]);
+  const tree: [number, number][] = [];
+  while (restIndices.size > 0) {
+    const candidateIndices = appendedIndices.flatMap((i) => (
+      [...restIndices].map((j) => (
+        [i, j] as [number, number]
+      ))
+    ));
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const [nearestAppendedIndex, nearestRestIndex] = (
+      Lodash.minBy(candidateIndices, ([i, j]) => distances[i][j])
+    )!;
+    appendedIndices.push(nearestRestIndex);
+    restIndices.delete(nearestRestIndex);
+    tree.push([nearestAppendedIndex, nearestRestIndex]);
+  }
+  return tree;
+};
+
 const initializeP5 = (p5: P5) => {
   /* eslint-disable no-param-reassign */
   p5.setup = () => {
     p5.createCanvas(1000, 500);
     const capitals = readCapitals(p5);
     p5.clear(0, 0, 0, 0);
-    capitals
-      .forEach((capital) => {
-        p5.circle(capital.x, capital.y, 10);
-      });
     const distances = capitals.map((a) => (
       capitals.map((b) => (
         Math.floor(Math.sqrt(Math.abs(a.x - b.x) ** 2 + Math.abs(a.y - b.y) ** 2))
       ))
     ));
-    console.log(distances);
+    const graph = generateMst(capitals, distances);
+    p5.stroke(0);
+    p5.fill('white');
+    capitals
+      .forEach((capital) => {
+        p5.circle(capital.x, capital.y, 10);
+      });
+    p5.stroke('yellow');
+    graph.forEach(([a, b]) => {
+      p5.line(capitals[a].x, capitals[a].y, capitals[b].x, capitals[b].y);
+    });
   };
   // p5.draw = () => {
   // };
