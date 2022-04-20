@@ -45,7 +45,7 @@ const thinOutCapitals = (capitals: Capital[]): Capital[] => {
   const distances = calcDistances(capitals);
   const resultIndices = (
     Lodash.range(0, capitals.length).filter((i) => (
-      Lodash.range(0, i - 1).every((j) => distances[i][j] > limit)
+      Lodash.range(0, i).every((j) => distances[i][j] > limit)
     ))
   );
   return resultIndices.map((i) => capitals[i]);
