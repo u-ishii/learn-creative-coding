@@ -32,17 +32,23 @@ const readCapitals = (p5: P5): Capital[] => {
     }));
 };
 
+const calcDistances = (capitals: Capital[]): number[][] => (
+  capitals.map((a) => (
+    capitals.map((b) => (
+      Math.floor(Math.sqrt(Math.abs(a.x - b.x) ** 2 + Math.abs(a.y - b.y) ** 2))
+    ))
+  ))
+);
+
 const thinOutCapitals = (capitals: Capital[]): Capital[] => {
-  const step = 20;
-  return Lodash.range(0, WIDTH, step).flatMap((gridX) => (
-    Lodash.range(0, HEIGHT, step).flatMap((gridY) => {
-      const gridCapitals = capitals.filter((capital) => (
-        capital.x >= gridX && capital.x < gridX + step
-        && capital.y >= gridY && capital.y < gridY + step
-      ));
-      return gridCapitals.length > 0 ? gridCapitals[0] : [];
-    })
-  ));
+  const limit = 10;
+  const distances = calcDistances(capitals);
+  const resultIndices = (
+    Lodash.range(0, capitals.length).filter((i) => (
+      Lodash.range(0, i - 1).every((j) => distances[i][j] > limit)
+    ))
+  );
+  return resultIndices.map((i) => capitals[i]);
 };
 
 const generateMst = (capitals: Capital[], distances: number[][]): Graph => {
@@ -76,11 +82,7 @@ const initializeP5 = (p5: P5) => {
     p5.frameRate(10);
     capitals = thinOutCapitals(readCapitals(p5));
     p5.clear(0, 0, 0, 0);
-    const distances = capitals.map((a) => (
-      capitals.map((b) => (
-        Math.floor(Math.sqrt(Math.abs(a.x - b.x) ** 2 + Math.abs(a.y - b.y) ** 2))
-      ))
-    ));
+    const distances = calcDistances(capitals);
     graph = generateMst(capitals, distances);
   };
   p5.draw = () => {
