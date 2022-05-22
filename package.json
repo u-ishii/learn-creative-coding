@@ -59,7 +59,10 @@
     ],
     "rules": {
       "import/prefer-default-export": "off",
-      "no-use-before-define": "off"
+      "no-use-before-define": "off",
+      "max-classes-per-file": "off",
+      "no-useless-constructor": "off",
+      "class-methods-use-this": "off"
     }
   },
   "browserslist": [
