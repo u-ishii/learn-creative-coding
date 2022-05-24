@@ -1,4 +1,4 @@
-import { Stack, Queue } from '../../src/types/iterator';
+import { Stack, Queue } from '../../../src/types/iterator';
 
 describe('Stack', () => {
   it('Push / Pop', () => {
