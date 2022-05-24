@@ -2,7 +2,7 @@ import {
   Piece, Board, isSimpleDraw, Move,
 } from '@/utils/board-ai';
 
-class TttPiece implements Piece {
+export class TttPiece implements Piece {
   constructor(
     public readonly view: string,
     private readonly oppositeGetter: () => TttPiece,
@@ -14,9 +14,9 @@ class TttPiece implements Piece {
   }
 }
 
-const PlayerPiece: TttPiece = new TttPiece('○', () => EnemyPiece);
-const EnemyPiece: TttPiece = new TttPiece('×', () => PlayerPiece);
-const NonePiece: TttPiece = new TttPiece('　', () => NonePiece);
+export const TttPlayer: TttPiece = new TttPiece('×', () => TttEnemy);
+export const TttEnemy: TttPiece = new TttPiece('○', () => TttPlayer);
+export const TttNone: TttPiece = new TttPiece('　', () => TttNone);
 
 const TttIndexes = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -38,13 +38,13 @@ export class TttBoard implements Board {
   }
 
   getLegalMoves(): Move[] {
-    return TttIndexes.filter((i) => this.position[i] === NonePiece);
+    return TttIndexes.filter((i) => this.position[i] === TttNone);
   }
 
   isWin(): boolean {
     return [
-      EnemyPiece,
-      PlayerPiece,
+      TttEnemy,
+      TttPlayer,
     ].some((piece) => (
       [
         [0, 1, 2],
