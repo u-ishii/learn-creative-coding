@@ -82,6 +82,9 @@
     "not ie 11"
   ],
   "jest": {
-    "preset": "@vue/cli-plugin-unit-jest/presets/typescript"
+    "preset": "@vue/cli-plugin-unit-jest/presets/typescript",
+    "moduleNameMapper": {
+      "^lodash-es$": "lodash"
+    }
   }
 }
