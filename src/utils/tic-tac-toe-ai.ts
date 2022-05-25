@@ -14,9 +14,9 @@ export class TttPiece implements Piece {
   }
 }
 
-export const TttPlayer: TttPiece = new TttPiece('×', () => TttEnemy);
-export const TttEnemy: TttPiece = new TttPiece('○', () => TttPlayer);
-export const TttNone: TttPiece = new TttPiece('　', () => TttNone);
+export const TttXPlayer: TttPiece = new TttPiece('×', () => TttOPlayer);
+export const TttOPlayer: TttPiece = new TttPiece('○', () => TttXPlayer);
+export const TttEmpty: TttPiece = new TttPiece('　', () => TttEmpty);
 
 const TttIndexes = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -38,13 +38,13 @@ export class TttBoard implements Board {
   }
 
   getLegalMoves(): Move[] {
-    return TttIndexes.filter((i) => this.position[i] === TttNone);
+    return TttIndexes.filter((i) => this.position[i] === TttEmpty);
   }
 
   isWin(): boolean {
     return [
-      TttEnemy,
-      TttPlayer,
+      TttOPlayer,
+      TttXPlayer,
     ].some((piece) => (
       [
         [0, 1, 2],
@@ -73,10 +73,6 @@ export class TttBoard implements Board {
   }
 
   buildText(): string {
-    return `
-${this.position[0]}${this.position[1]}${this.position[2]}
-${this.position[3]}${this.position[4]}${this.position[5]}
-${this.position[6]}${this.position[7]}${this.position[8]}
-    `.trim();
+    return this.position.map(piece => piece.view).toString();
   }
 }
