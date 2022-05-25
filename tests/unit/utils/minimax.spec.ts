@@ -30,4 +30,17 @@ describe('findBestMove', () => {
     expect(bestResult.move).toBe(2);
     expect(bestResult.isWin).toBe(true);
   });
+  it('2手で勝つ', () => {
+    const board = new TttBoard(
+      [
+        X, E, E,
+        E, E, O,
+        O, X, E,
+      ],
+      X,
+    );
+    const bestResult = findBestMove(board);
+    expect(bestResult.move).toBe(1);
+    expect(bestResult.isWin).toBe(true);
+  });
 });
