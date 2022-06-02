@@ -3,10 +3,6 @@ import {
   Piece, Board, isSimpleDraw, Move,
 } from '@/utils/board-ai';
 
-const C4_X_SIZE = 7;
-const C4_Y_SIZE = 6;
-const C4_SEGMENT_SIZE = 4;
-
 export class C4Piece implements Piece {
   constructor(
     public readonly view: string,
@@ -41,7 +37,7 @@ const generateVectorSegments = (
   )
 );
 
-const generateAllSegments = (
+export const generateAllSegments = (
   (xSize: number, ySize: number, segmentSize: number): [number, number][][] => {
     const xEnd = xSize - segmentSize + 1;
     const yEnd = ySize - segmentSize + 1;
@@ -65,8 +61,8 @@ export class C4Column {
   ) {
   }
 
-  isFull(): boolean {
-    return this.values.length >= this.length;
+  get full(): boolean {
+    return this.restSize <= 0;
   }
 
   get restSize() {
@@ -74,10 +70,10 @@ export class C4Column {
   }
 
   push(value: C4Piece): C4Column {
-    if (this.isFull()) {
+    if (this.full) {
       throw new Error('COLUMN_FULL');
     }
-    return new C4Column(this.length, [...this.values, value]);
+    return new C4Column(this.length, [value, ...this.values]);
   }
 
   get(i: number): C4Piece {
@@ -91,7 +87,10 @@ export class C4Column {
 export class C4Board implements Board {
   constructor(
     public readonly columns: C4Column[],
-    private readonly turn: C4Piece,
+    public readonly turn: C4Piece,
+    private readonly xSize: number = 7,
+    private readonly ySize: number = 6,
+    private readonly segmentSize: number = 4,
   ) {
   }
 
@@ -102,11 +101,17 @@ export class C4Board implements Board {
   move(location: number): C4Board {
     const newColumns = [...this.columns];
     newColumns[location] = newColumns[location].push(this.turn);
-    return new C4Board(newColumns, this.turn.getOpposite());
+    return new C4Board(
+      newColumns,
+      this.turn.getOpposite(),
+      this.xSize,
+      this.ySize,
+      this.segmentSize,
+    );
   }
 
   getLegalMoves(): Move[] {
-    return _.range(C4_X_SIZE).filter((i) => !this.columns[i].isFull());
+    return _.range(this.xSize).filter((i) => !this.columns[i].full);
   }
 
   isWin(): boolean {
@@ -114,7 +119,7 @@ export class C4Board implements Board {
       C4BPlayer,
       C4RPlayer,
     ].some((piece) => (
-      generateAllSegments(C4_X_SIZE, C4_Y_SIZE, C4_SEGMENT_SIZE).some((segment) => (
+      generateAllSegments(this.xSize, this.ySize, this.segmentSize).some((segment) => (
         segment.every(([x, y]) => this.columns[x].get(y) === piece)
       ))
     ));
@@ -133,9 +138,9 @@ export class C4Board implements Board {
 
   buildText(): string {
     return _.times(
-      C4_Y_SIZE,
+      this.ySize,
       (y) => _.times(
-        C4_X_SIZE,
+        this.xSize,
         (x) => this.columns[x].get(y).view,
       ).join(),
     ).join('\n');
