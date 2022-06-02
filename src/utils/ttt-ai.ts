@@ -73,6 +73,6 @@ export class TttBoard implements Board {
   }
 
   buildText(): string {
-    return this.position.map(piece => piece.view).toString();
+    return this.position.map((piece) => piece.view).toString();
   }
 }

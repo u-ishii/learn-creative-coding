@@ -1,7 +1,7 @@
 import { findBestMove } from '../../../src/utils/minimax';
 import {
   TttBoard, TttXPlayer as X, TttOPlayer as O, TttEmpty as E,
-} from '../../../src/utils/tic-tac-toe-ai';
+} from '../../../src/utils/ttt-ai';
 
 describe('findBestMove', () => {
   it('1手で勝つ', () => {
