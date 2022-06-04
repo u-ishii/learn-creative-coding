@@ -37,6 +37,18 @@ const initializeP5 = (p5: P5) => {
     p5.rect(10, 10, 40 * board.xSize + 10, 50);
     p5.pop();
   };
+  const drawMove = () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const droppedIndex = _.range(board.ySize)
+      .find((i) => board.columns[playerMove].get(i) !== C4Empty)!;
+    const color = board.turn.getOpposite() === C4BPlayer ? 'darkblue' : 'darkred';
+    p5.push();
+    p5.fill(color);
+    p5.noStroke();
+    p5.translate(40, 80);
+    p5.circle(playerMove * 40, droppedIndex * 40, 30);
+    p5.pop();
+  };
   /* eslint-disable no-param-reassign */
   p5.setup = () => {
     p5.createCanvas(p5.windowWidth, p5.windowHeight);
@@ -60,16 +72,7 @@ const initializeP5 = (p5: P5) => {
     }
     if (event.key === ' ') {
       board = board.move(playerMove);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const droppedIndex = _.range(board.ySize)
-        .find((i) => board.columns[playerMove].get(i) !== C4Empty)!;
-      const color = board.turn.getOpposite() === C4BPlayer ? 'darkblue' : 'darkred';
-      p5.push();
-      p5.fill(color);
-      p5.noStroke();
-      p5.translate(40, 80);
-      p5.circle(playerMove * 40, droppedIndex * 40, 30);
-      p5.pop();
+      drawMove();
     }
   };
   /* eslint-enable no-param-reassign */
