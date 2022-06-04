@@ -87,9 +87,9 @@ export class C4Column {
 export class C4Board implements Board {
   constructor(
     public readonly columns: ReadonlyArray<C4Column>,
-    private readonly xSize: number = 7,
-    private readonly ySize: number = 6,
-    private readonly segmentSize: number = 4,
+    public readonly xSize: number = 7,
+    public readonly ySize: number = 6,
+    public readonly segmentSize: number = 4,
     public readonly turn: C4Piece = C4BPlayer,
   ) {
   }
