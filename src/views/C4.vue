@@ -6,10 +6,10 @@
 import { defineComponent } from 'vue';
 import * as _ from 'lodash-es';
 import P5 from 'p5';
-import { C4Board } from '@/utils/c4-ai';
+import { C4Board, C4BPlayer, C4Empty } from '@/utils/c4-ai';
 
 const initializeP5 = (p5: P5) => {
-  const board = C4Board.empty();
+  let board = C4Board.empty();
   let playerMove = 0;
   const drawInitialBoard = () => {
     p5.push();
@@ -48,14 +48,29 @@ const initializeP5 = (p5: P5) => {
   // p5.draw = () => {
   // };
   p5.keyPressed = (event: KeyboardEvent) => {
-    if (event.key === 'ArrowLeft' && playerMove > 0) {
-      playerMove -= 1;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      if (event.key === 'ArrowLeft' && playerMove > 0) {
+        playerMove -= 1;
+      }
+      if (event.key === 'ArrowRight' && playerMove < board.xSize - 1) {
+        playerMove += 1;
+      }
+      eraseArrow();
+      drawArrow();
     }
-    if (event.key === 'ArrowRight' && playerMove < board.xSize - 1) {
-      playerMove += 1;
+    if (event.key === ' ') {
+      board = board.move(playerMove);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const droppedIndex = _.range(board.ySize)
+        .find((i) => board.columns[playerMove].get(i) !== C4Empty)!;
+      const color = board.turn.getOpposite() === C4BPlayer ? 'darkblue' : 'darkred';
+      p5.push();
+      p5.fill(color);
+      p5.noStroke();
+      p5.translate(40, 80);
+      p5.circle(playerMove * 40, droppedIndex * 40, 30);
+      p5.pop();
     }
-    eraseArrow();
-    drawArrow();
   };
   /* eslint-enable no-param-reassign */
 };
