@@ -145,10 +145,31 @@ export class C4Board implements Board {
   }
 
   evaluate(player: Piece): number {
-    if (this.isWin()) {
-      return this.turn === player ? -1 : 1;
-    }
-    return 0;
+    const countPieces = (segment: [number, number][], piece: Piece): number => (
+      segment.filter(([x, y]) => this.columns[x].get(y) === piece).length
+    );
+    return _.sum(
+      generateAllSegments(this.xSize, this.ySize, this.segmentSize)
+        .map((segment) => {
+          const playerCount = countPieces(segment, player);
+          const enemyCount = countPieces(segment, player.getOpposite());
+          if (playerCount > 0 && enemyCount > 0) {
+            return 0;
+          }
+          const maxCount = Math.max(playerCount, enemyCount);
+          const sign = playerCount > enemyCount ? 1 : -1;
+          if (maxCount === 2) {
+            return 1 * sign;
+          }
+          if (maxCount === 3) {
+            return 100 * sign;
+          }
+          if (maxCount === 4) {
+            return 1000000 * sign;
+          }
+          return 0;
+        }),
+    );
   }
 
   buildText(): string {
