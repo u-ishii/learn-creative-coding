@@ -12,7 +12,7 @@ import {
 import { findBestMove } from '@/utils/minimax';
 
 const initializeP5 = (p5: P5) => {
-  let phase: 'Player' | 'EnemyStart' | 'EnemyThink' = 'Player';
+  let phase: 'Player' | 'EnemyStart' | 'EnemyThink' | 'End' = 'Player';
   let board = C4Board.empty();
   let playerMove = 0;
   const drawBoard = () => {
@@ -59,7 +59,7 @@ const initializeP5 = (p5: P5) => {
         const { move: enemyMove } = findBestMove(board, 3);
         board = board.move(enemyMove);
         drawBoard();
-        phase = 'Player';
+        phase = board.isWin() ? 'End' : 'Player';
       })();
     }
   };
@@ -77,7 +77,7 @@ const initializeP5 = (p5: P5) => {
     if (event.key === ' ' && phase === 'Player') {
       board = board.move(playerMove);
       drawBoard();
-      phase = 'EnemyStart';
+      phase = board.isWin() ? 'End' : 'EnemyStart';
     }
   };
   /* eslint-enable no-param-reassign */
