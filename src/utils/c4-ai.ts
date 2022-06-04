@@ -57,7 +57,7 @@ export const generateAllSegments = (
 export class C4Column {
   constructor(
     private readonly length: number,
-    private readonly values: C4Piece[],
+    private readonly values: ReadonlyArray<C4Piece>,
   ) {
   }
 
@@ -86,12 +86,27 @@ export class C4Column {
 
 export class C4Board implements Board {
   constructor(
-    public readonly columns: C4Column[],
-    public readonly turn: C4Piece,
+    public readonly columns: ReadonlyArray<C4Column>,
     private readonly xSize: number = 7,
     private readonly ySize: number = 6,
     private readonly segmentSize: number = 4,
+    public readonly turn: C4Piece = C4BPlayer,
   ) {
+  }
+
+  public static empty(
+    xSize = 7,
+    ySize = 6,
+    segmentSize = 4,
+    turn: C4Piece = C4BPlayer,
+  ): C4Board {
+    return new C4Board(
+      _.times(xSize, () => new C4Column(ySize, [])),
+      xSize,
+      ySize,
+      segmentSize,
+      turn,
+    );
   }
 
   getTurn(): Piece {
@@ -103,10 +118,10 @@ export class C4Board implements Board {
     newColumns[location] = newColumns[location].push(this.turn);
     return new C4Board(
       newColumns,
-      this.turn.getOpposite(),
       this.xSize,
       this.ySize,
       this.segmentSize,
+      this.turn.getOpposite(),
     );
   }
 

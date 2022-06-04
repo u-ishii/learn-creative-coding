@@ -1,5 +1,5 @@
 import {
-  C4Column, generateAllSegments, C4BPlayer as B, C4RPlayer as R, C4Empty as E,
+  C4Column, generateAllSegments, C4BPlayer as B, C4RPlayer as R, C4Empty as E, C4Board,
 } from '../../../src/utils/c4-ai';
 
 it('generateAllSegments', () => {
@@ -18,11 +18,21 @@ it('generateAllSegments', () => {
 });
 
 it('C4Column', () => {
-  const column = new C4Column(3, []).push(B).push(R);
+  let column = new C4Column(3, []).push(B).push(R);
   expect(column.get(0)).toBe(E);
   expect(column.get(1)).toBe(R);
   expect(column.get(2)).toBe(B);
   expect(column.full).toBe(false);
-  const fullColumn = column.push(B);
-  expect(fullColumn.full).toBe(true);
+  column = column.push(B);
+  expect(column.full).toBe(true);
+});
+
+it('C4Board', () => {
+  let board = C4Board.empty(2, 3, 3);
+  board = board.move(0).move(1).move(0).move(1);
+  expect(board.getLegalMoves()).toEqual([0, 1]);
+  expect(board.isWin()).toBe(false);
+  board = board.move(0);
+  expect(board.getLegalMoves()).toEqual([1]);
+  expect(board.isWin()).toBe(true);
 });
